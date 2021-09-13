@@ -7,14 +7,8 @@ import (
     guuid "github.com/google/uuid"
     "time"
     "errors"
-    "encoding/json"
-    "os"
-    "io/ioutil"
     "fmt"
-)
-
-const (
-    authorizedUsers = "./data/accounts.json"
+    cache "github.com/patrickmn/go-cache"
 )
 
 type Navitem struct {
@@ -29,43 +23,41 @@ type Content struct {
     SessionCookie string
 }
 
+const (
+    HOME_template = "./ui/templates/home.gtpl"
+    QR_template = "./ui/templates/qr.gtpl"
+    LOGIN_template = "./ui/templates/login.gtpl"
+    AUTH_template = "./ui/templates/authenticated.gtpl"
+)
+
+var (
+    DEFAULT_CONTENT = Content{}
+    AUTH_NAV = []Navitem{{Title: "authenticated", Route: "/auth"}}
+    CACHE = cache.New(5*time.Minute, 10*time.Minute)
+)
+
 func home(w http.ResponseWriter, r *http.Request) {
-    files := []string{
-        "./ui/templates/home.gtpl",
-        "./ui/templates/base.gtpl",
-        "./ui/templates/footer.gtpl",
-    }
-    
     _, _, err := verifySessionCookie(r)
-    
     if err != nil{
-        serve(files, w, r, Content{Nav: nil, Img: ""})
+        serve(HOME_template, DEFAULT_CONTENT, w, r)
     } else {
-        data := []Navitem{{Title: "authenticated", Route: "/auth"}}
-        img, err := imgBase64Str(penguinFilename)
+        img, err := imgBase64Str("./ui/static/img/pngegg.png")
         if err != nil {
             img = ""
         }
-        content := Content{Nav : data, Img: img}
-        serve(files, w, r, content)
+        content := Content{Img: img}
+        serve(HOME_template, content, w, r)
     }
 }
 
-func login(w http.ResponseWriter, r *http.Request) {
-    files := []string{
-        "./ui/templates/login.gtpl",
-        "./ui/templates/base.gtpl",
-        "./ui/templates/footer.gtpl",
-    }
-    
+func login(w http.ResponseWriter, r *http.Request) {    
     if r.Method == "GET" {
         sc, account, err := verifySessionCookie(r)
         if err != nil{
-            serve(files, w, r, Content{Nav: nil, Img: ""})
+            serve(LOGIN_template, DEFAULT_CONTENT, w, r)
         } else {
-            data := []Navitem{{Title: "authenticated", Route: "/auth"}}
-            content := Content{Nav : data, Account : account, SessionCookie: sc}
-            serve(files, w, r, content)
+            content := Content{Account : account, SessionCookie: sc}
+            serve(LOGIN_template, content, w, r)
         }
     }
 
@@ -74,46 +66,14 @@ func login(w http.ResponseWriter, r *http.Request) {
         user := r.Form["username"][0]
         pw := r.Form["password"][0]
         if passwordCheck(user, pw) != nil{
-            serve(files, w, r, Content{Nav: nil, Img: ""})
+            serve(LOGIN_template, DEFAULT_CONTENT, w, r)
         } else {
             // generate QR code
             base64str :=  genQR(user)
-            content := Content{Nav : nil, Img: base64str, Account: user}
-            files := []string{
-                "./ui/templates/qr.gtpl",
-                "./ui/templates/base.gtpl",
-                "./ui/templates/footer.gtpl",
-            }
-            serve(files, w, r, content)
+            content := Content{Img: base64str, Account: user}
+            serve(QR_template, content, w, r)
         }
     }
-}
-
-func passwordCheck(account string, password string) error {
-    jsonFile, err := os.Open(authorizedUsers)
-    if err != nil {
-        fmt.Println(err)
-        return err
-    }
-    defer jsonFile.Close()
-
-    byteValue, _ := ioutil.ReadAll(jsonFile)
-
-    // unmarshall the data
-    var data map[string]interface{}
-    err = json.Unmarshal(byteValue, &data)
-    if err != nil {
-        fmt.Println(err)
-        return err
-    }
-
-    h := hash(password)
-
-    if data[account] != h{
-        return errors.New("unauthorized")
-    }
-
-    return nil
 }
 
 func logout(w http.ResponseWriter, r *http.Request){
@@ -134,19 +94,10 @@ func auth(w http.ResponseWriter, r *http.Request) {
        
         _, err, authenticated := verify(tokenstr)
         if authenticated && err == nil {
-            files := []string{
-                "./ui/templates/authenticated.gtpl",
-                "./ui/templates/base.gtpl",
-                "./ui/templates/footer.gtpl",
-            }
-
             // set session cookie for authenticated user
             token := guuid.New().String()
             setSessionCookie(accountstr, token, w)
-
-            data := []Navitem{{Title: "authenticated", Route: "/auth"}}
-            content := Content{Nav : data}
-            serve(files, w, r, content)
+            serve(AUTH_template, Content{Nav : AUTH_NAV}, w, r)
         } else {
             fmt.Println(err)
             home(w,r)
@@ -158,19 +109,22 @@ func auth(w http.ResponseWriter, r *http.Request) {
         if err != nil{
             home(w,r)
         } else {
-            files := []string{
-                "./ui/templates/authenticated.gtpl",
-                "./ui/templates/base.gtpl",
-                "./ui/templates/footer.gtpl",
-            }
-            data := []Navitem{{Title: "authenticated", Route: "/auth"}}
-            content := Content{Nav : data}
-            serve(files, w, r, content)
+            serve(AUTH_template, DEFAULT_CONTENT, w, r)
         }
     }
 }
 
-func serve(files []string, w http.ResponseWriter, r *http.Request, data Content) {
+func serve(file string, data Content, w http.ResponseWriter, r *http.Request) {
+    files := []string{
+        file,
+        "./ui/templates/base.gtpl",
+        "./ui/templates/footer.gtpl",
+    }
+    _, _, err := verifySessionCookie(r)
+    if err == nil {
+        data.Nav = AUTH_NAV
+    }
+    
     ts, err := template.ParseFiles(files...)
     if err != nil {
         log.Println(err.Error())
@@ -188,7 +142,7 @@ func serve(files []string, w http.ResponseWriter, r *http.Request, data Content)
 func setSessionCookie(account string, token string, w http.ResponseWriter){
 	// Set the token in the cache, along with the user whom it represents
 	// The token has an expiry time of 120 seconds
-	gocache.Set(account, token, 120 * time.Second)
+	CACHE.Set(account, token, 120 * time.Second)
 
 	// set the client cookie for "session_token" as the session token we just generated
 	// we also set an expiry time of 120 seconds, the same as the cache
@@ -206,7 +160,7 @@ func setSessionCookie(account string, token string, w http.ResponseWriter){
 }
 
 func deleteSessionCookie(account string){
-	gocache.Delete(account)
+	CACHE.Delete(account)
 }
 
 func verifySessionCookie(r *http.Request) (string, string, error) {
@@ -222,7 +176,7 @@ func verifySessionCookie(r *http.Request) (string, string, error) {
 	}
 	account := c2.Value
 
-	st, _ := gocache.Get(account)
+	st, _ := CACHE.Get(account)
 	if st == nil {
 		return account, "", errors.New("unauthorized")
 	}

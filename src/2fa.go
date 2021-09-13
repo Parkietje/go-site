@@ -13,7 +13,6 @@ import (
 
 const (
 	qrFilename = "./ui/static/img/qr.png"
-	penguinFilename = "./ui/static/img/pngegg.png"
 )
 
 var (

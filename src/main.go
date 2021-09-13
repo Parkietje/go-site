@@ -3,11 +3,7 @@ package main
 import (
     "log"
     "net/http"
-    cache "github.com/patrickmn/go-cache"
-	"time"
 )
-
-var gocache = cache.New(5*time.Minute, 10*time.Minute)
 
 func main() {
     mux := http.NewServeMux()
