@@ -11,16 +11,16 @@ import (
     cache "github.com/patrickmn/go-cache"
 )
 
-type Navitem struct {
-    Title string
-    Route  string
-}
-
 type Content struct {
     Nav []Navitem
     Img string
     Account string
     SessionCookie string
+}
+
+type Navitem struct {
+    Title string
+    Route  string
 }
 
 const (
@@ -65,12 +65,14 @@ func login(w http.ResponseWriter, r *http.Request) {
         r.ParseForm()
         user := r.Form["username"][0]
         pw := r.Form["password"][0]
+        
         if passwordCheck(user, pw) != nil{
             serve(LOGIN_template, DEFAULT_CONTENT, w, r)
         } else {
+            secret := getSecret(user)
             // generate QR code
-            base64str :=  genQR(user)
-            content := Content{Img: base64str, Account: user}
+            img :=  genQR(user, secret)
+            content := Content{Img: img, Account: user}
             serve(QR_template, content, w, r)
         }
     }
@@ -87,16 +89,15 @@ func logout(w http.ResponseWriter, r *http.Request){
 func auth(w http.ResponseWriter, r *http.Request) {
     if r.Method == "POST" {
         r.ParseForm()
-        token := r.Form["token"]
-        tokenstr := token[0]
-        account := r.Form["account"]
-        accountstr := account[0] 
-       
-        _, err, authenticated := verify(tokenstr)
+        token := r.Form["token"][0]
+        account := r.Form["account"][0]
+        secret := getSecret(account)
+
+        _, err, authenticated := verify(token, secret)
         if authenticated && err == nil {
             // set session cookie for authenticated user
             token := guuid.New().String()
-            setSessionCookie(accountstr, token, w)
+            setSessionCookie(account, token, w)
             serve(AUTH_template, Content{Nav : AUTH_NAV}, w, r)
         } else {
             fmt.Println(err)

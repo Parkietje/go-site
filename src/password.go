@@ -8,38 +8,15 @@ import (
     "encoding/json"
     "io/ioutil"
     "errors"
+    "crypto/rand"
+    "encoding/base32"
 )
 
 const (
-    hashesJson = "./data/hashes.json"
-    saltsJson =  "./data/salts.json"
+    JSON_hashes = "./data/hashes.json"
+    JSON_salts =  "./data/salts.json"
+    JSON_secrets = "./data/secrets.json"
 )
-
-func passwordCheck(account string, password string) error {
-    hashes, err := unmarshall(hashesJson)
-    if err != nil{
-        return errors.New("unauthorized")
-    }
-
-    salts, err := unmarshall(saltsJson)
-    if err != nil{
-        return errors.New("unauthorized")
-    }
-
-    var salt string
-
-    if keyExists(salts, account){
-        salt = salts[account].(string)
-    }
-
-    h := hash(password, salt)
-
-    if hashes[account] != h{
-        return errors.New("unauthorized")
-    }
-
-    return nil
-}
 
 func hash(password string, salt string) string{
     h := sha3.New512()
@@ -48,7 +25,37 @@ func hash(password string, salt string) string{
 	return hex.EncodeToString(sum)
 }
 
-func unmarshall(jsonFile string) (map[string]interface{}, error) {
+func passwordCheck(account string, password string) error {
+    hashes, err := unmarshal(JSON_hashes)
+    if err != nil{
+        return errors.New("unauthorized")
+    }
+
+    salts, err := unmarshal(JSON_salts)
+    if err != nil{
+        return errors.New("unauthorized")
+    }
+
+    var salt string
+
+    if keyExists(salts, account){
+        salt = salts[account]
+    }
+
+    h := hash(password, salt)
+
+    if hashes[account] != h{
+        return errors.New("unauthorized")
+    }
+    return nil
+}
+
+func keyExists(decoded map[string]string, key string) bool {
+    val, ok := decoded[key]
+    return ok && val != ""
+}
+
+func unmarshal(jsonFile string) (map[string]string, error) {
     //read json file
     file, err := os.Open(jsonFile)
     if err != nil {
@@ -58,8 +65,8 @@ func unmarshall(jsonFile string) (map[string]interface{}, error) {
     defer file.Close()
     byteValue, _ := ioutil.ReadAll(file)
 
-    // unmarshall the data
-    var data map[string]interface{}
+    // unmarshal the data
+    var data map[string]string
     err = json.Unmarshal(byteValue, &data)
     if err != nil {
         fmt.Println(err)
@@ -68,7 +75,54 @@ func unmarshall(jsonFile string) (map[string]interface{}, error) {
     return data, err
 }
 
-func keyExists(decoded map[string]interface{}, key string) bool {
-    val, ok := decoded[key]
-    return ok && val != nil
+func marshal(jsonFile string, data map[string]string) error {
+    obj, err := json.Marshal(data)
+    if err != nil {
+        fmt.Println(err)
+        return err
+    }
+
+    fmt.Println(string(obj))
+
+    err = ioutil.WriteFile(jsonFile, obj, 0644)
+    return err
+}
+
+func keyGen(password string) string {
+	//hash the master password to get a sufficient amount of bytes
+	bytes := []byte(hash(password, "SOME_SALT"))
+
+	//return string representation of first 32 bytes
+	return hex.EncodeToString(bytes[0:32])
+}
+
+func getSecret(username string) string {
+	secrets, err := unmarshal(JSON_secrets)
+    if err != nil{
+        panic(err)
+    }
+    var secret string
+    if keyExists(secrets, username){
+        secret = secrets[username]
+    } else {
+		secret = genSecret()
+		secrets[username] = secret
+		marshal(JSON_secrets, secrets)
+	}
+
+	return decrypt(secret, keyGen(MASTER_PASSWORD))
+}
+
+func genSecret() string {
+	//generate random secret //TODO: secure random function?
+	secret := make([]byte, 10)
+	if _, err := rand.Read(secret); err != nil {
+		panic(err)
+	}
+
+	//encrypt secret
+	encrypted := encrypt(base32.StdEncoding.EncodeToString(secret), keyGen(MASTER_PASSWORD))
+
+	//return the encrypted secret
+	return encrypted
 }
