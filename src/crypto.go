@@ -1,11 +1,11 @@
 package main
 
 import (
-	"encoding/hex"
-	"fmt"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"encoding/hex"
+	"fmt"
 	"io"
 )
 

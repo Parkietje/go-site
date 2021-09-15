@@ -1,11 +1,12 @@
 package main
 
 import (
-    "log"
-    "net/http"
-    "fmt"
-    "strings"
-    "golang.org/x/term"
+	"fmt"
+	"log"
+	"net/http"
+	"strings"
+
+	"golang.org/x/term"
 )
 
 // Master secret to encrypt all generated qr codes.
@@ -15,17 +16,17 @@ import (
 var MASTER_PASSWORD string
 
 func main() {
-    MASTER_PASSWORD = credentials()
+	MASTER_PASSWORD = credentials()
 
-    mux := http.NewServeMux()
-    mux.HandleFunc("/", home)
-    mux.HandleFunc("/login", login)
-    mux.HandleFunc("/logout", logout)
-    mux.HandleFunc("/auth", auth)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", home)
+	mux.HandleFunc("/login", login)
+	mux.HandleFunc("/logout", logout)
+	mux.HandleFunc("/auth", auth)
 
-    log.Println("Starting server on :4000")
-    err := http.ListenAndServe(":4000", mux)
-    log.Fatal(err)
+	log.Println("Starting server on :4000")
+	err := http.ListenAndServe(":4000", mux)
+	log.Fatal(err)
 }
 
 // read credentials from stdin without echo'ing them in terminal history
