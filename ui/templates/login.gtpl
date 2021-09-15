@@ -4,7 +4,7 @@
 
 {{define "main"}}
 
-{{if not .SessionCookie}}
+{{if not .User.SessionCookie}}
     <h2>Log in</h2>
     <form action="/login" method="post">
     Username:<input type="text" name="username">

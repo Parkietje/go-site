@@ -14,9 +14,8 @@
         </header>
         <nav>
             <a href='/'>Home</a>
-            <a href='/login'>Login</a>
-            {{if .Nav}}
-                {{range .Nav}}
+            {{if .Navigation}}
+                {{range .Navigation}}
                     <a href='{{.Route}}'>{{.Title}}</a>
                 {{end}}
             {{end}}

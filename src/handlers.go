@@ -4,16 +4,19 @@ import (
     "html/template"
     "log"           
     "net/http"
-    guuid "github.com/google/uuid"
     "time"
     "errors"
-    "fmt"
-    cache "github.com/patrickmn/go-cache"
+    "github.com/google/uuid"
+    "github.com/patrickmn/go-cache"
 )
 
 type Content struct {
-    Nav []Navitem
-    Img string
+    Navigation []Navitem
+    PNG string
+    User
+}
+
+type User struct {
     Account string
     SessionCookie string
 }
@@ -27,38 +30,37 @@ const (
     HOME_template = "./ui/templates/home.gtpl"
     QR_template = "./ui/templates/qr.gtpl"
     LOGIN_template = "./ui/templates/login.gtpl"
-    AUTH_template = "./ui/templates/authenticated.gtpl"
 )
 
 var (
-    DEFAULT_CONTENT = Content{}
-    AUTH_NAV = []Navitem{{Title: "authenticated", Route: "/auth"}}
+    DEFAULT_CONTENT = Content{Navigation: []Navitem{{Title: "Login", Route: "/login"}}}
+    DEFAULT_USER = User{}
+    DEFAULT_NAV = []Navitem{{Title: "Login", Route: "/login"}}
+    AUTH_NAV = []Navitem{{Title: "Logout", Route: "/login"}}
     CACHE = cache.New(5*time.Minute, 10*time.Minute)
 )
 
 func home(w http.ResponseWriter, r *http.Request) {
-    _, _, err := verifySessionCookie(r)
-    if err != nil{
-        serve(HOME_template, DEFAULT_CONTENT, w, r)
-    } else {
-        img, err := imgBase64Str("./ui/static/img/pngegg.png")
-        if err != nil {
-            img = ""
-        }
-        content := Content{Img: img}
-        serve(HOME_template, content, w, r)
+    content := DEFAULT_CONTENT
+    user, sc, err := verifySessionCookie(r)
+    if err == nil {
+        content.Navigation = AUTH_NAV
+        img, _ := imgBase64Str("./ui/static/img/pngegg.png")
+        content.PNG = img
+        content.User = User{Account: user, SessionCookie: sc}
     }
+    serve(HOME_template, content, w, r)
 }
 
 func login(w http.ResponseWriter, r *http.Request) {    
     if r.Method == "GET" {
-        sc, account, err := verifySessionCookie(r)
-        if err != nil{
-            serve(LOGIN_template, DEFAULT_CONTENT, w, r)
-        } else {
-            content := Content{Account : account, SessionCookie: sc}
-            serve(LOGIN_template, content, w, r)
+        content := DEFAULT_CONTENT
+        user, sc, err := verifySessionCookie(r)
+        if err == nil {
+            content.Navigation = AUTH_NAV
+            content.User = User{Account: user, SessionCookie: sc}
         }
+        serve(LOGIN_template, content, w, r)
     }
 
     if r.Method == "POST" {
@@ -72,18 +74,10 @@ func login(w http.ResponseWriter, r *http.Request) {
             secret := getSecret(user)
             // generate QR code
             img :=  genQR(user, secret)
-            content := Content{Img: img, Account: user}
+            content := Content{DEFAULT_NAV, img, User{Account : user}}
             serve(QR_template, content, w, r)
         }
     }
-}
-
-func logout(w http.ResponseWriter, r *http.Request){
-    account, _, err := verifySessionCookie(r)
-    if err == nil{
-        deleteSessionCookie(account)
-    }
-    login(w,r)
 }
 
 func auth(w http.ResponseWriter, r *http.Request) {
@@ -96,44 +90,44 @@ func auth(w http.ResponseWriter, r *http.Request) {
         _, err, authenticated := verify(token, secret)
         if authenticated && err == nil {
             // set session cookie for authenticated user
-            token := guuid.New().String()
+            token := uuid.New().String()
             setSessionCookie(account, token, w)
-            serve(AUTH_template, Content{Nav : AUTH_NAV}, w, r)
-        } else {
-            fmt.Println(err)
-            home(w,r)
+            img, _ := imgBase64Str("./ui/static/img/pngegg.png")
+            content := Content{Navigation: AUTH_NAV , PNG: img, User: User{Account:account, SessionCookie: token}}
+            serve(HOME_template, content, w, r)
+            return
         }
     }
-
-    if r.Method == "GET" {
-        _, _, err := verifySessionCookie(r)
-        if err != nil{
-            home(w,r)
-        } else {
-            serve(AUTH_template, DEFAULT_CONTENT, w, r)
-        }
-    }
+    home(w,r)
 }
 
-func serve(file string, data Content, w http.ResponseWriter, r *http.Request) {
+func logout(w http.ResponseWriter, r *http.Request){
+    account, _, err := verifySessionCookie(r)
+    if err == nil{
+        deleteSessionCookie(account)
+    }
+    login(w,r)
+}
+
+func serve(file string, content Content, w http.ResponseWriter, r *http.Request) {
     files := []string{
         file,
         "./ui/templates/base.gtpl",
         "./ui/templates/footer.gtpl",
     }
-    _, _, err := verifySessionCookie(r)
+
+    sc, account, err := verifySessionCookie(r)
     if err == nil {
-        data.Nav = AUTH_NAV
+        content.User = User{Account : account, SessionCookie: sc}
     }
     
     ts, err := template.ParseFiles(files...)
     if err != nil {
         log.Println(err.Error())
         http.Error(w, "Internal Server Error", 500)
-        return
     }
 
-    err = ts.Execute(w, data)
+    err = ts.Execute(w, content)
     if err != nil {
         log.Println(err.Error())
         http.Error(w, "Internal Server Error", 500)

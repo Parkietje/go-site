@@ -10,6 +10,6 @@
     <input type="submit" value="Auth">
 </form>
 <div class="col-4 col-sm-4 col-md-3 col-xl-2 center">
-    <img src="data:image/png;base64,{{.Img}}" class="img-fluid image-dashboard" />
+    <img src="data:image/png;base64,{{.PNG}}" class="img-fluid image-dashboard" />
 </div>
 {{end}}

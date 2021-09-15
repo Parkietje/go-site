@@ -4,9 +4,9 @@ import (
 	"net/url"
 	"os"
 	"bufio"
-	dgoogauth "github.com/dgryski/dgoogauth"
-	qr "rsc.io/qr"
 	"encoding/base64"
+	"github.com/dgryski/dgoogauth"
+	"rsc.io/qr"
 )
 
 func genQR(account string, secret string) string {
@@ -47,8 +47,10 @@ func verify(token string, secret string) (dgoogauth.OTPConfig, error, bool) {
 }
 
 func imgBase64Str(fileName string) (string , error) {
-	imgFile, err := os.Open(fileName) // a QR code image
-
+	imgFile, err := os.Open(fileName)
+	if err != nil{
+		return "", err
+	}
   	defer imgFile.Close()
 
   	// create a new buffer base on file size
@@ -60,5 +62,5 @@ func imgBase64Str(fileName string) (string , error) {
   	fReader := bufio.NewReader(imgFile)
   	fReader.Read(buf)
 	
-  	return base64.StdEncoding.EncodeToString(buf), err
+  	return base64.StdEncoding.EncodeToString(buf), nil
 }
