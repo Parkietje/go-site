@@ -89,11 +89,10 @@ func marshal(jsonFile string, data map[string]string) error {
 }
 
 func keyGen(password string) string {
-	//hash the master password to get a sufficient amount of bytes
-	bytes := []byte(hash(password, "SOME_SALT"))
-
-	//return string representation of first 32 bytes
-	return hex.EncodeToString(bytes[0:32])
+    //hash the master password to get a sufficient amount of bytes
+    bytes := []byte(hash(password, "SOME_SALT"))    
+    //return string representation of first 32 bytes
+    return hex.EncodeToString(bytes[0:32])
 }
 
 func getSecret(username string) string {
@@ -114,15 +113,13 @@ func getSecret(username string) string {
 }
 
 func genSecret() string {
-	//generate random secret //TODO: secure random function?
-	secret := make([]byte, 10)
-	if _, err := rand.Read(secret); err != nil {
-		panic(err)
-	}
-
-	//encrypt secret
-	encrypted := encrypt(base32.StdEncoding.EncodeToString(secret), keyGen(MASTER_PASSWORD))
-
-	//return the encrypted secret
-	return encrypted
+    //generate random secret //TODO: secure random function?
+    secret := make([]byte, 10)
+    if _, err := rand.Read(secret); err != nil {
+    	panic(err)
+    }   
+    //encrypt secret
+    encrypted := encrypt(base32.StdEncoding.EncodeToString(secret), keyGen(MASTER_PASSWORD))    
+    //return the encrypted secret
+    return encrypted
 }
