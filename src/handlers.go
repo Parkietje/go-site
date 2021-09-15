@@ -10,7 +10,7 @@ import (
     "github.com/patrickmn/go-cache"
 )
 
-type Content struct {
+type Context struct {
     Navigation []Navitem
     PNG string
     User
@@ -33,33 +33,23 @@ const (
 )
 
 var (
-    DEFAULT_CONTENT = Content{Navigation: []Navitem{{Title: "Login", Route: "/login"}}}
-    DEFAULT_USER = User{}
-    DEFAULT_NAV = []Navitem{{Title: "Login", Route: "/login"}}
+    DEFAULT_CONTEXT = Context{Navigation: []Navitem{{Title: "Login", Route: "/login"}}}
     AUTH_NAV = []Navitem{{Title: "Logout", Route: "/login"}}
     CACHE = cache.New(5*time.Minute, 10*time.Minute)
 )
 
 func home(w http.ResponseWriter, r *http.Request) {
-    content := DEFAULT_CONTENT
-    user, sc, err := verifySessionCookie(r)
-    if err == nil {
-        content.Navigation = AUTH_NAV
+    context, auth := getContext(r)
+    if auth {
         img, _ := imgBase64Str("./ui/static/img/pngegg.png")
-        content.PNG = img
-        content.User = User{Account: user, SessionCookie: sc}
+        context.PNG = img
     }
-    serve(HOME_template, content, w, r)
+    serve(HOME_template, context, w, r)
 }
 
 func login(w http.ResponseWriter, r *http.Request) {    
     if r.Method == "GET" {
-        content := DEFAULT_CONTENT
-        user, sc, err := verifySessionCookie(r)
-        if err == nil {
-            content.Navigation = AUTH_NAV
-            content.User = User{Account: user, SessionCookie: sc}
-        }
+        content, _ := getContext(r)
         serve(LOGIN_template, content, w, r)
     }
 
@@ -69,12 +59,12 @@ func login(w http.ResponseWriter, r *http.Request) {
         pw := r.Form["password"][0]
         
         if passwordCheck(user, pw) != nil{
-            serve(LOGIN_template, DEFAULT_CONTENT, w, r)
+            serve(LOGIN_template, DEFAULT_CONTEXT, w, r)
         } else {
+            // generate QR code if password matches
             secret := getSecret(user)
-            // generate QR code
             img :=  genQR(user, secret)
-            content := Content{DEFAULT_NAV, img, User{Account : user}}
+            content := Context{AUTH_NAV, img, User{Account : user}}
             serve(QR_template, content, w, r)
         }
     }
@@ -87,14 +77,14 @@ func auth(w http.ResponseWriter, r *http.Request) {
         account := r.Form["account"][0]
         secret := getSecret(account)
 
+        // set session cookie for authenticated user
         _, err, authenticated := verify(token, secret)
         if authenticated && err == nil {
-            // set session cookie for authenticated user
             token := uuid.New().String()
             setSessionCookie(account, token, w)
             img, _ := imgBase64Str("./ui/static/img/pngegg.png")
-            content := Content{Navigation: AUTH_NAV , PNG: img, User: User{Account:account, SessionCookie: token}}
-            serve(HOME_template, content, w, r)
+            context := Context{Navigation: AUTH_NAV , PNG: img, User: User{Account:account, SessionCookie: token}}
+            serve(HOME_template, context, w, r)
             return
         }
     }
@@ -104,30 +94,39 @@ func auth(w http.ResponseWriter, r *http.Request) {
 func logout(w http.ResponseWriter, r *http.Request){
     account, _, err := verifySessionCookie(r)
     if err == nil{
-        deleteSessionCookie(account)
+        deleteSessionCookie(account, w)
     }
     login(w,r)
 }
 
-func serve(file string, content Content, w http.ResponseWriter, r *http.Request) {
+func getContext(r *http.Request) (Context, bool) {
+    context := DEFAULT_CONTEXT
+    sc, account, err := verifySessionCookie(r)
+    if err != nil {
+        // user not authenticated, return default content
+        return context, false
+    } else {
+        // user authenticated, return authenticated content
+        context.Navigation = AUTH_NAV
+        context.User = User{Account : account, SessionCookie: sc}
+        return context, true
+    }
+}
+
+func serve(file string, context Context, w http.ResponseWriter, r *http.Request) {
     files := []string{
         file,
         "./ui/templates/base.gtpl",
         "./ui/templates/footer.gtpl",
     }
 
-    sc, account, err := verifySessionCookie(r)
-    if err == nil {
-        content.User = User{Account : account, SessionCookie: sc}
-    }
-    
     ts, err := template.ParseFiles(files...)
     if err != nil {
         log.Println(err.Error())
         http.Error(w, "Internal Server Error", 500)
     }
 
-    err = ts.Execute(w, content)
+    err = ts.Execute(w, context)
     if err != nil {
         log.Println(err.Error())
         http.Error(w, "Internal Server Error", 500)
@@ -135,12 +134,11 @@ func serve(file string, content Content, w http.ResponseWriter, r *http.Request)
 }
 
 func setSessionCookie(account string, token string, w http.ResponseWriter){
-	// Set the token in the cache, along with the user whom it represents
-	// The token has an expiry time of 120 seconds
-	CACHE.Set(account, token, 120 * time.Second)
+	// add username to cache
+    if account != "" {
+        CACHE.Set(account, token, 120 * time.Second)
+    }
 
-	// set the client cookie for "session_token" as the session token we just generated
-	// we also set an expiry time of 120 seconds, the same as the cache
 	http.SetCookie(w, &http.Cookie{
 		Name:    "session_token",
 		Value:   token,
@@ -154,31 +152,33 @@ func setSessionCookie(account string, token string, w http.ResponseWriter){
 	})
 }
 
-func deleteSessionCookie(account string){
-	CACHE.Delete(account)
+func deleteSessionCookie(account string, w http.ResponseWriter){
+	//remove token from cache
+    CACHE.Delete(account)
+    //delete request cookie by setting empty value
+    setSessionCookie("", "", w)
 }
 
 func verifySessionCookie(r *http.Request) (string, string, error) {
-	c, err := r.Cookie("session_token")
+    c, err := r.Cookie("account")
 	if err != nil {
 		return "", "", errors.New("unauthorized")
 	}
-	sessionToken := c.Value
-
-    c2, err := r.Cookie("account")
+    c2, err := r.Cookie("session_token")
 	if err != nil {
 		return "", "", errors.New("unauthorized")
 	}
-	account := c2.Value
 
-	st, _ := CACHE.Get(account)
-	if st == nil {
+    //check if request cookie is stored in cache
+    account := c.Value
+    cookie_token := c2.Value
+	cache_token, _ := CACHE.Get(account)
+	
+    if cache_token == nil || cache_token == "" {
 		return account, "", errors.New("unauthorized")
 	}
-
-    if st != sessionToken {
+    if cache_token != cookie_token {
         return account, "", errors.New("unauthorized")
     }
-
-    return account, sessionToken, nil
+    return account, cookie_token, nil
 }
