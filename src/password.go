@@ -97,7 +97,7 @@ func keyGen(password string) string {
 }
 
 func getSecret(username string) string {
-	secrets, err := unmarshal(JSON_secrets)
+    secrets, err := unmarshal(JSON_secrets)
     if err != nil{
         panic(err)
     }
@@ -105,12 +105,12 @@ func getSecret(username string) string {
     if keyExists(secrets, username){
         secret = secrets[username]
     } else {
-		secret = genSecret()
-		secrets[username] = secret
-		marshal(JSON_secrets, secrets)
-	}
-
-	return decrypt(secret, keyGen(MASTER_PASSWORD))
+        secret = genSecret()
+        secrets[username] = secret
+        marshal(JSON_secrets, secrets)
+    }
+    
+    return decrypt(secret, keyGen(MASTER_PASSWORD))
 }
 
 func genSecret() string {
