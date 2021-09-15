@@ -22,7 +22,7 @@ func hash(password string, salt string) string{
     h := sha3.New512()
     h.Write([]byte(password+salt))
     sum := h.Sum(nil)
-	return hex.EncodeToString(sum)
+    return hex.EncodeToString(sum)
 }
 
 func passwordCheck(account string, password string) error {
