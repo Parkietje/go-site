@@ -2,7 +2,7 @@
 This is a simple web portal which features 2-Factor Authentication for securely logging in.
 
 ## Security
-- User passwords are never stored as cleartext, instead they are salted and hashed.
+- Usernames and passwords are never stored as cleartext, instead they are salted and hashed.
 
 - 2FA randomly generated secrets are stored on disc, encrypted with a master secret. 
 

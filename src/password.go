@@ -46,6 +46,7 @@ func passwordCheck(account string, password string) error {
 	h := hash(password, salt)
 
 	if hashes[account] != h {
+		fmt.Println("password mismatch")
 		return errors.New("unauthorized")
 	}
 	return nil
@@ -85,13 +86,6 @@ func marshal(jsonFile string, data map[string]string) error {
 	return ioutil.WriteFile(jsonFile, obj, 0644)
 }
 
-func keyGen(password string) string {
-	//hash the master password to get a sufficient amount of bytes
-	bytes := []byte(hash(password, "SOME_SALT"))
-	//return string representation of first 32 bytes
-	return hex.EncodeToString(bytes[0:32])
-}
-
 func getSecret(username string) string {
 	secrets, err := unmarshal(JSON_secrets)
 	if err != nil {
@@ -119,4 +113,11 @@ func genSecret() string {
 	encrypted := encrypt(base32.StdEncoding.EncodeToString(secret), keyGen(MASTER_PASSWORD))
 	//return the encrypted secret
 	return encrypted
+}
+
+func keyGen(password string) string {
+	//hash the master password to get a sufficient amount of bytes
+	bytes := []byte(hash(password, "SOME_SALT"))
+	//return string representation of first 32 bytes
+	return hex.EncodeToString(bytes[0:32])
 }

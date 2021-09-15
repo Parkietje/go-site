@@ -58,12 +58,12 @@ func login(w http.ResponseWriter, r *http.Request) {
 		user := r.Form["username"][0]
 		pw := r.Form["password"][0]
 		// generate QR code if password matches
-		if passwordCheck(user, pw) != nil {
+		if passwordCheck(hash(user, ""), pw) != nil {
 			render(LOGIN_template, DEFAULT_CONTEXT, w, r)
 		} else {
-			secret := getSecret(user)
+			secret := getSecret(hash(user, ""))
 			img := genQR(user, secret)
-			context := Context{AUTH_NAV, img, User{Account: user}}
+			context := Context{AUTH_NAV, img, User{Account: hash(user, "")}}
 			render(QR_template, context, w, r)
 		}
 	}
