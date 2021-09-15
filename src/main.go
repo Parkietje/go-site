@@ -3,9 +3,9 @@ package main
 import (
     "log"
     "net/http"
-	"fmt"
-	"strings"
-	"golang.org/x/term"
+    "fmt"
+    "strings"
+    "golang.org/x/term"
 )
 
 // Master secret to encrypt all generated qr codes.

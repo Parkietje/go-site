@@ -76,7 +76,7 @@ func auth(w http.ResponseWriter, r *http.Request) {
         token := r.Form["token"][0]
         account := r.Form["account"][0]
         secret := getSecret(account)
-
+    
         // set session cookie for authenticated user
         _, err, authenticated := verify(token, secret)
         if authenticated && err == nil {
@@ -134,26 +134,24 @@ func serve(file string, context Context, w http.ResponseWriter, r *http.Request)
 }
 
 func setSessionCookie(account string, token string, w http.ResponseWriter){
-	// add username to cache
+    // add username to cache
     if account != "" {
         CACHE.Set(account, token, 120 * time.Second)
-    }
-
-	http.SetCookie(w, &http.Cookie{
-		Name:    "session_token",
-		Value:   token,
-		Expires: time.Now().Add(120 * time.Second),
-	})
-
+    }   
     http.SetCookie(w, &http.Cookie{
-		Name:    "account",
-		Value:   account,
-		Expires: time.Now().Add(120 * time.Second),
-	})
+    	Name:    "session_token",
+    	Value:   token,
+    	Expires: time.Now().Add(120 * time.Second),
+    })  
+    http.SetCookie(w, &http.Cookie{
+    	Name:    "account",
+    	Value:   account,
+    	Expires: time.Now().Add(120 * time.Second),
+    })
 }
 
 func deleteSessionCookie(account string, w http.ResponseWriter){
-	//remove token from cache
+    //remove token from cache
     CACHE.Delete(account)
     //delete request cookie by setting empty value
     setSessionCookie("", "", w)
@@ -161,22 +159,22 @@ func deleteSessionCookie(account string, w http.ResponseWriter){
 
 func verifySessionCookie(r *http.Request) (string, string, error) {
     c, err := r.Cookie("account")
-	if err != nil {
-		return "", "", errors.New("unauthorized")
-	}
+    if err != nil {
+        return "", "", errors.New("unauthorized")
+    }
     c2, err := r.Cookie("session_token")
-	if err != nil {
-		return "", "", errors.New("unauthorized")
-	}
+    if err != nil {
+        return "", "", errors.New("unauthorized")
+    }
 
     //check if request cookie is stored in cache
     account := c.Value
     cookie_token := c2.Value
-	cache_token, _ := CACHE.Get(account)
-	
+    cache_token, _ := CACHE.Get(account)
+
     if cache_token == nil || cache_token == "" {
-		return account, "", errors.New("unauthorized")
-	}
+    	return account, "", errors.New("unauthorized")
+    }
     if cache_token != cookie_token {
         return account, "", errors.New("unauthorized")
     }

@@ -2,7 +2,7 @@ package main
 
 import (
     "golang.org/x/crypto/sha3"
-	"encoding/hex"
+    "encoding/hex"
     "os"
     "fmt"
     "encoding/json"
