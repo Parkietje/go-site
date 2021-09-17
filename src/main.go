@@ -1,12 +1,11 @@
 package main
 
 import (
-	"fmt"
+	"flag"
 	"log"
 	"net/http"
-	"strings"
 
-	"golang.org/x/term"
+	"github.com/gorilla/mux"
 )
 
 // Master secret to encrypt all generated qr codes.
@@ -16,27 +15,25 @@ import (
 var MASTER_PASSWORD string
 
 func main() {
-	MASTER_PASSWORD = credentials()
+	adminFlag := flag.Bool("admin", false, "if true an admin account can be added on startup")
+	flag.Parse()
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", home)
-	mux.HandleFunc("/login", login)
-	mux.HandleFunc("/logout", logout)
-	mux.HandleFunc("/auth", auth)
+	MASTER_PASSWORD = readPassword()
+
+	if *adminFlag {
+		addAdmin()
+	}
+
+	r := mux.NewRouter()
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("../ui/static/"))))
+	r.HandleFunc("/", home)
+	r.HandleFunc("/login", login)
+	r.HandleFunc("/logout", logout)
+	r.HandleFunc("/auth", auth)
+	r.HandleFunc("/admin/", admin)
+	r.HandleFunc("/admin/{service}", admin)
 
 	log.Println("Starting server on :4000")
-	err := http.ListenAndServe(":4000", mux)
+	err := http.ListenAndServe(":4000", r)
 	log.Fatal(err)
-}
-
-// read credentials from stdin without echo'ing them in terminal history
-// DO NOT LOG/PRINT SECRET
-func credentials() string {
-	fmt.Print("Enter master password: \n")
-	bytePassword, err := term.ReadPassword(0)
-	if err != nil {
-		fmt.Println(err)
-	}
-	password := string(bytePassword)
-	return strings.TrimSpace(password)
 }

@@ -23,6 +23,7 @@ header, nav, main, footer {
 
 main {
     margin-top: 54px;
+    margin-left: 200px;
     margin-bottom: 54px;
     min-height: calc(100vh - 345px);
     overflow: auto;

@@ -37,6 +37,13 @@ func verify(token string, secret string) (dgoogauth.OTPConfig, error, bool) {
 		WindowSize:  3,
 		HotpCounter: 0,
 	}
+
+	// REMOVE THIS BLOCK AFTER TESTING
+	if token == "" {
+		return *otpc, nil, true
+	}
+	// REMOVE THIS BLOCK AFTER TESTING
+
 	val, err := otpc.Authenticate(token)
 	return *otpc, err, val
 }

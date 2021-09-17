@@ -2,9 +2,11 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -28,21 +30,23 @@ type Navitem struct {
 }
 
 const (
-	HOME_template  = "./ui/templates/home.gtpl"
-	QR_template    = "./ui/templates/qr.gtpl"
-	LOGIN_template = "./ui/templates/login.gtpl"
+	HOME_template  = "../ui/templates/home.gtpl"
+	QR_template    = "../ui/templates/qr.gtpl"
+	LOGIN_template = "../ui/templates/login.gtpl"
+	ADMIN_template = "../ui/templates/admin.gtpl"
 )
 
 var (
 	DEFAULT_CONTEXT = Context{Navigation: []Navitem{{Title: "Login", Route: "/login"}}}
 	AUTH_NAV        = []Navitem{{Title: "Logout", Route: "/login"}}
+	ADMIN_NAV       = []Navitem{{Title: "Admin", Route: "/admin"}, {Title: "Logout", Route: "/login"}}
 	CACHE           = cache.New(5*time.Minute, 10*time.Minute)
 )
 
 func home(w http.ResponseWriter, r *http.Request) {
 	context, auth := getContext(r)
 	if auth {
-		img, _ := imgBase64Str("./ui/static/img/pngegg.png")
+		img, _ := imgBase64Str("../ui/static/img/pngegg.png")
 		context.PNG = img
 	}
 	render(HOME_template, context, w, r)
@@ -80,13 +84,50 @@ func auth(w http.ResponseWriter, r *http.Request) {
 		if authenticated && err == nil {
 			token := uuid.New().String()
 			setSessionCookie(account, token, w)
-			img, _ := imgBase64Str("./ui/static/img/pngegg.png")
+			img, _ := imgBase64Str("../ui/static/img/pngegg.png")
 			context := Context{Navigation: AUTH_NAV, PNG: img, User: User{Account: account, SessionCookie: token}}
+			if account == ADMIN {
+				context.Navigation = ADMIN_NAV
+			}
 			render(HOME_template, context, w, r)
 			return
 		}
 	}
 	home(w, r)
+}
+
+func admin(w http.ResponseWriter, r *http.Request) {
+	user, _, err := verifySessionCookie(r)
+	if (err == nil) && (user == ADMIN) {
+		urlparts := strings.Split(r.RequestURI, "/")
+		switch service := urlparts[2]; service {
+		case "add":
+			r.ParseForm()
+			user := r.Form["username"][0]
+			password := r.Form["password"][0]
+			salt := r.Form["salt"][0]
+			addUser(user, password, salt)
+			fmt.Println("user added")
+		case "delete":
+			r.ParseForm()
+			user := r.Form["hash"][0]
+			deleteUser(user)
+			fmt.Println("user deleted")
+		case "stats":
+			//which stats? amount of page visits?
+			//ip addresses? https://golangbyexample.com/golang-ip-address-http-request/
+			fmt.Println("show stats")
+		case "browse":
+			//show files safely
+			fmt.Println("browse files")
+		default:
+			fmt.Println("default")
+		}
+		context, _ := getContext(r)
+		render(ADMIN_template, context, w, r)
+	} else {
+		home(w, r)
+	}
 }
 
 func logout(w http.ResponseWriter, r *http.Request) {
@@ -99,23 +140,27 @@ func logout(w http.ResponseWriter, r *http.Request) {
 
 func getContext(r *http.Request) (Context, bool) {
 	context := DEFAULT_CONTEXT
-	sc, account, err := verifySessionCookie(r)
+	account, sc, err := verifySessionCookie(r)
 	if err != nil {
-		// user not authenticated, return default context
 		return context, false
 	} else {
-		// user authenticated, return authenticated context
-		context.Navigation = AUTH_NAV
-		context.User = User{Account: account, SessionCookie: sc}
-		return context, true
+		if account == ADMIN {
+			context.Navigation = ADMIN_NAV
+			context.User = User{Account: account, SessionCookie: sc}
+			return context, true
+		} else {
+			context.Navigation = AUTH_NAV
+			context.User = User{Account: account, SessionCookie: sc}
+			return context, true
+		}
 	}
 }
 
 func render(file string, context Context, w http.ResponseWriter, r *http.Request) {
 	files := []string{
 		file,
-		"./ui/templates/base.gtpl",
-		"./ui/templates/footer.gtpl",
+		"../ui/templates/base.gtpl",
+		"../ui/templates/footer.gtpl",
 	}
 
 	ts, err := template.ParseFiles(files...)
