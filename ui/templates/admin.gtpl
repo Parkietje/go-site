@@ -5,7 +5,6 @@
 {{define "main"}}
 <div class="sidenav">
     <a onclick="show('stats')">Statistics</a>
-    <a onclick="show('browse')">Browse</a>
     <a onclick="show('add')">Add user</a>
     <a onclick="show('delete')">Delete user</a>
 </div>
@@ -19,6 +18,7 @@
     <input type="submit" value="Add user">
     </form>
 </div>
+
 <div class="delete">
     <h2>Delete user</h2>
     <form action="/admin/delete" method="post">
@@ -26,11 +26,25 @@
     <input type="submit" value="Delete user">
     </form>
 </div>
-<div class="browse">
-  This is my BROWSE element.
-</div>
+
 <div class="stats">
-  This is my STATS element.
+  <h2>Some website statistics</h2>
+        <nav2>
+            <ul>
+                {{range .PageContent.Webstats.Stats}}
+                  <li>{{.Name}} : {{.Value}}</li>
+                {{end}}
+            </ul>
+        </nav2>
+
+  <h2>IP addresses that visited</h2>
+        <nav2>
+            <ul>
+                {{range .PageContent.Webstats.IPs}}
+                  <li>{{.Address}} : {{.Count}}</li>
+                {{end}}
+            </ul>
+        </nav2>
 </div>
 
 
@@ -39,9 +53,6 @@
         display:block
     }
     .delete {
-        display:block
-    }
-    .browse {
         display:block
     }
     .stats {
@@ -80,12 +91,15 @@
     @media screen and (max-height: 450px) {
       .sidenav {padding-top: 15px;}
       .sidenav a {font-size: 18px;}
-    } 
+    }
+
+    nav2 ul{height:100px; width:100%;margin-bottom: 10px}
+    nav2 ul{overflow:hidden; overflow-y:scroll;} 
 </style>
 
 <script>
   function hideAll() {
-    	const names = ['add', 'browse', 'stats', 'delete']
+    	const names = ['add', 'stats', 'delete']
     	function get(thing) { return document.getElementsByClassName(thing)[0]}
     	for (const n of names) {
     		get(n).style.display = "none";
@@ -96,7 +110,7 @@
 <script>
   hideAll();
   function show(name) {
-  	const names = ['add', 'browse', 'stats', 'delete']
+  	const names = ['add', 'stats', 'delete']
   	function get(thing) { return document.getElementsByClassName(thing)[0]}
   	var x = get(name)
   	if (x.style.display === "none") {

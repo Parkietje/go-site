@@ -14,9 +14,8 @@ import (
 )
 
 type Context struct {
-	Navigation []Navitem
-	PNG        string
 	User
+	PageContent
 }
 
 type User struct {
@@ -24,9 +23,36 @@ type User struct {
 	SessionCookie string
 }
 
+type PageContent struct {
+	Navigation []Navitem
+	Messages   []Message
+	Webstats
+	PNG string
+}
+
+type Webstats struct {
+	Stats []Stat
+	IPs   []IP
+}
+
+type IP struct {
+	Address string
+	Count   string
+}
+
+type Stat struct {
+	Name  string
+	Value string
+}
+
 type Navitem struct {
 	Title string
 	Route string
+}
+
+type Message struct {
+	Title string
+	Text  string
 }
 
 const (
@@ -37,13 +63,17 @@ const (
 )
 
 var (
-	DEFAULT_CONTEXT = Context{Navigation: []Navitem{{Title: "Login", Route: "/login"}}}
+	DEFAULT_NAV     = []Navitem{{Title: "Login", Route: "/login"}}
 	AUTH_NAV        = []Navitem{{Title: "Logout", Route: "/login"}}
 	ADMIN_NAV       = []Navitem{{Title: "Admin", Route: "/admin"}, {Title: "Logout", Route: "/login"}}
+	DEFAULT_CONTENT = PageContent{Navigation: DEFAULT_NAV}
+	DEFAULT_CONTEXT = Context{User{}, DEFAULT_CONTENT}
 	CACHE           = cache.New(5*time.Minute, 10*time.Minute)
 )
 
 func home(w http.ResponseWriter, r *http.Request) {
+	addStat("page_visits")
+	addIP(ReadUserIP(r))
 	context, auth := getContext(r)
 	if auth {
 		img, _ := imgBase64Str("../ui/static/img/pngegg.png")
@@ -63,11 +93,13 @@ func login(w http.ResponseWriter, r *http.Request) {
 		pw := r.Form["password"][0]
 		// generate QR code if password matches
 		if passwordCheck(hash(user, ""), pw) != nil {
+			addStat("failed_logins")
 			render(LOGIN_template, DEFAULT_CONTEXT, w, r)
 		} else {
+			addStat("logins")
 			secret := getSecret(hash(user, ""))
 			img := genQR(user, secret)
-			context := Context{AUTH_NAV, img, User{Account: hash(user, "")}}
+			context := Context{User{Account: hash(user, "")}, PageContent{AUTH_NAV, nil, Webstats{}, img}}
 			render(QR_template, context, w, r)
 		}
 	}
@@ -85,9 +117,9 @@ func auth(w http.ResponseWriter, r *http.Request) {
 			token := uuid.New().String()
 			setSessionCookie(account, token, w)
 			img, _ := imgBase64Str("../ui/static/img/pngegg.png")
-			context := Context{Navigation: AUTH_NAV, PNG: img, User: User{Account: account, SessionCookie: token}}
+			context := Context{User{account, token}, PageContent{AUTH_NAV, nil, Webstats{}, img}}
 			if account == ADMIN {
-				context.Navigation = ADMIN_NAV
+				context.PageContent.Navigation = ADMIN_NAV
 			}
 			render(HOME_template, context, w, r)
 			return
@@ -99,8 +131,10 @@ func auth(w http.ResponseWriter, r *http.Request) {
 func admin(w http.ResponseWriter, r *http.Request) {
 	user, _, err := verifySessionCookie(r)
 	if (err == nil) && (user == ADMIN) {
+		context, _ := getContext(r)
 		urlparts := strings.Split(r.RequestURI, "/")
 		switch service := urlparts[2]; service {
+
 		case "add":
 			r.ParseForm()
 			user := r.Form["username"][0]
@@ -108,22 +142,30 @@ func admin(w http.ResponseWriter, r *http.Request) {
 			salt := r.Form["salt"][0]
 			addUser(user, password, salt)
 			fmt.Println("user added")
+
 		case "delete":
 			r.ParseForm()
 			user := r.Form["hash"][0]
 			deleteUser(user)
 			fmt.Println("user deleted")
-		case "stats":
-			//which stats? amount of page visits?
-			//ip addresses? https://golangbyexample.com/golang-ip-address-http-request/
-			fmt.Println("show stats")
-		case "browse":
-			//show files safely
-			fmt.Println("browse files")
+
 		default:
 			fmt.Println("default")
 		}
-		context, _ := getContext(r)
+
+		ips, _ := unmarshal(IP_FILE)
+		var ipslice []IP
+		for k, v := range ips {
+			var ip IP
+			ip.Address = k
+			ip.Count = v
+			ipslice = append(ipslice, ip)
+		}
+		stats, _ := unmarshal(STATS_FILE)
+		wstats := []Stat{{"logins", stats["logins"]}, {"failed_logins", stats["failed_logins"]}, {"page_visits", stats["page_visits"]}}
+		context.PageContent.Webstats.Stats = wstats
+		context.PageContent.Webstats.IPs = ipslice
+
 		render(ADMIN_template, context, w, r)
 	} else {
 		home(w, r)
@@ -144,13 +186,12 @@ func getContext(r *http.Request) (Context, bool) {
 	if err != nil {
 		return context, false
 	} else {
+		context.User = User{Account: account, SessionCookie: sc}
 		if account == ADMIN {
-			context.Navigation = ADMIN_NAV
-			context.User = User{Account: account, SessionCookie: sc}
+			context.PageContent.Navigation = ADMIN_NAV
 			return context, true
 		} else {
-			context.Navigation = AUTH_NAV
-			context.User = User{Account: account, SessionCookie: sc}
+			context.PageContent.Navigation = AUTH_NAV
 			return context, true
 		}
 	}
@@ -193,13 +234,6 @@ func setSessionCookie(account string, token string, w http.ResponseWriter) {
 	})
 }
 
-func deleteSessionCookie(account string, w http.ResponseWriter) {
-	//remove token from cache
-	CACHE.Delete(account)
-	//delete request cookie by setting empty value
-	setSessionCookie("", "", w)
-}
-
 func verifySessionCookie(r *http.Request) (string, string, error) {
 	c, err := r.Cookie("account")
 	if err != nil {
@@ -222,4 +256,22 @@ func verifySessionCookie(r *http.Request) (string, string, error) {
 		return account, "", errors.New("unauthorized")
 	}
 	return account, cookie_token, nil
+}
+
+func deleteSessionCookie(account string, w http.ResponseWriter) {
+	//remove token from cache
+	CACHE.Delete(account)
+	//delete request cookie by setting empty value
+	setSessionCookie("", "", w)
+}
+
+func ReadUserIP(r *http.Request) string {
+	IPAddress := r.Header.Get("X-Real-Ip")
+	if IPAddress == "" {
+		IPAddress = r.Header.Get("X-Forwarded-For")
+	}
+	if IPAddress == "" {
+		IPAddress = r.RemoteAddr
+	}
+	return IPAddress
 }

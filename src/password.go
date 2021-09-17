@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strconv"
 	"strings"
 
 	"golang.org/x/crypto/sha3"
@@ -16,9 +17,11 @@ import (
 )
 
 const (
-	JSON_hashes  = "../data/hashes.json"
-	JSON_salts   = "../data/salts.json"
-	JSON_secrets = "../data/secrets.json"
+	JSON_hashes  = "../data/accounts/hashes.json"
+	JSON_salts   = "../data/accounts/salts.json"
+	JSON_secrets = "../data/accounts/secrets.json"
+	STATS_FILE   = "../data/stats/webstats.json"
+	IP_FILE      = "../data/stats/ip-addresses.json"
 )
 
 var (
@@ -133,17 +136,17 @@ func keyGen(password string) string {
 	return hex.EncodeToString(bytes[0:32])
 }
 
-// store new user in /data files
+// store new user in /data/accounts files
 func addUser(user string, password string, salt string) (err error) {
 	user = hash(user, "")
 
 	// add to file lambda
-	add := func(hash string, value string, file string) (err error) {
+	add := func(key string, value string, file string) (err error) {
 		jmap, err := unmarshal(file)
 		if err != nil {
 			return
 		}
-		jmap[hash] = value
+		jmap[key] = value
 		return marshal(file, jmap)
 	}
 
@@ -159,7 +162,7 @@ func addUser(user string, password string, salt string) (err error) {
 	return add(user, genSecret(), JSON_secrets)
 }
 
-// delete user info from /data files
+// delete user info from /data/accounts files
 // param user should be the hashed username
 func deleteUser(user string) (err error) {
 	// delete lambda
@@ -213,4 +216,37 @@ func readPassword() string {
 	}
 	password := string(bytePassword)
 	return strings.TrimSpace(password)
+}
+
+//increment web stat
+func addStat(stat string) (err error) {
+	jmap, err := unmarshal(STATS_FILE)
+	if err != nil {
+		return
+	}
+	count := jmap[stat]
+	if i, err := strconv.Atoi(count); err == nil {
+		i++
+		count = strconv.Itoa(i)
+	}
+	jmap[stat] = count
+	return marshal(STATS_FILE, jmap)
+}
+
+//increment web stat
+func addIP(ip string) (err error) {
+	jmap, err := unmarshal(IP_FILE)
+	if err != nil {
+		return
+	}
+	if keyExists(jmap, ip) {
+		count := jmap[ip]
+		if i, err := strconv.Atoi(count); err == nil {
+			i++
+			count = strconv.Itoa(i)
+		}
+	} else {
+		jmap[ip] = "1"
+	}
+	return marshal(IP_FILE, jmap)
 }
