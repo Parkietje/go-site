@@ -14,7 +14,7 @@
 {{else}}
     <h2>Log out</h2>
     <form action="/logout">
-    <input type="submit" value="Logout" />
+        <input type="submit" value="Logout" />
     </form>
 {{end}}
 

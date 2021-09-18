@@ -93,7 +93,7 @@
       .sidenav a {font-size: 18px;}
     }
 
-    nav2 ul{height:100px; width:100%;margin-bottom: 10px}
+    nav2 ul{height:170px; width:100%;margin-bottom: 10px}
     nav2 ul{overflow:hidden; overflow-y:scroll;} 
 </style>
 
