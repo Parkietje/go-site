@@ -19,3 +19,6 @@
 {{end}}
 
 {{end}}
+{{define "script"}}
+
+{{end}}
