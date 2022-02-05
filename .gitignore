@@ -1,4 +1,11 @@
-.DS_Store
+# secrets
 .env
+
+# binary
 app/app
+
+# generated
 app/data/
+
+# OSX files
+.DS_Store

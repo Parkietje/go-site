@@ -21,7 +21,6 @@ var (
 	ADMIN string
 	// used as secret key for data encryption
 	MASTER_PASSWORD string
-
 	// holds our static web server content.
 	//go:embed ui/static/*
 	STATIC embed.FS
