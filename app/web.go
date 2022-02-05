@@ -37,12 +37,11 @@ func login(w http.ResponseWriter, r *http.Request) {
 		if passwordCheck(hash(user, ""), pw) != nil {
 			render(LOGIN_template, DEFAULT_CONTEXT, w, r)
 		} else {
-			account := hash(user, "")
 			token := uuid.New().String()
-			setSessionCookie(account, token, w)
+			setSessionCookie(user, token, w)
 			img, _ := imgBase64Str("ui/static/img/pngegg.png")
-			context := Context{User{account, token}, PageContent{AUTH_NAV, nil, img}}
-			if account == ADMIN {
+			context := Context{User{user, token}, PageContent{AUTH_NAV, nil, img}}
+			if user == ADMIN {
 				context.PageContent.Navigation = ADMIN_NAV
 			}
 			render(HOME_template, context, w, r)

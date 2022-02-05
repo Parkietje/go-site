@@ -1,4 +1,4 @@
 #!/bin/bash
-rm src
+rm app
 go build .
-./src
+./app

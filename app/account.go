@@ -6,25 +6,16 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"strings"
-
-	"golang.org/x/term"
-)
-
-const (
-	JSON_hashes  = "../data/accounts/hashes.json"
-	JSON_salts   = "../data/accounts/salts.json"
-	JSON_secrets = "../data/accounts/secrets.json"
 )
 
 // check if provided password matches, return error if not
 func passwordCheck(account string, password string) error {
-	hashes, err := unmarshal(JSON_hashes)
+	hashes, err := unmarshal(HASHES)
 	if err != nil {
 		return errors.New("unauthorized")
 	}
 
-	salts, err := unmarshal(JSON_salts)
+	salts, err := unmarshal(SALTS)
 	if err != nil {
 		return errors.New("unauthorized")
 	}
@@ -62,15 +53,15 @@ func addUser(user string, password string, salt string) (err error) {
 	}
 
 	//append to files
-	err = add(user, salt, JSON_salts)
+	err = add(user, salt, SALTS)
 	if err != nil {
 		return
 	}
-	err = add(user, hash(password, salt), JSON_hashes)
+	err = add(user, hash(password, salt), HASHES)
 	if err != nil {
 		return
 	}
-	return add(user, genSecret(), JSON_secrets)
+	return add(user, genSecret(), SECRETS)
 }
 
 // delete user info from /data/accounts files
@@ -91,42 +82,15 @@ func deleteUser(user string) (err error) {
 	user = hash(user, "")
 
 	// delete from files
-	err = del(user, JSON_hashes)
+	err = del(user, HASHES)
 	if err != nil {
 		return err
 	}
-	err = del(user, JSON_salts)
+	err = del(user, SALTS)
 	if err != nil {
 		return err
 	}
-	return del(user, JSON_secrets)
-}
-
-// add admin account from stdin
-func addAdmin() error {
-	fmt.Println("Enter admin account name: ")
-	var user string
-	fmt.Scanln(&user)
-
-	pw := readPassword()
-
-	fmt.Println("Enter salt for admin: ")
-	var salt string
-	fmt.Scanln(&salt)
-
-	ADMIN = user
-	return addUser(user, pw, salt)
-}
-
-// read credentials from stdin without echo'ing them in terminal history
-func readPassword() string {
-	fmt.Println("Enter password: ")
-	bytePassword, err := term.ReadPassword(0)
-	if err != nil {
-		fmt.Println(err)
-	}
-	password := string(bytePassword)
-	return strings.TrimSpace(password)
+	return del(user, SECRETS)
 }
 
 // check if key exists in map

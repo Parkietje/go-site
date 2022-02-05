@@ -14,7 +14,7 @@ import (
 
 // read file and return decrypted secret for user
 func getSecret(username string) string {
-	secrets, err := unmarshal(JSON_secrets)
+	secrets, err := unmarshal(SECRETS)
 	if err != nil {
 		panic(err)
 	}
@@ -24,7 +24,7 @@ func getSecret(username string) string {
 	} else {
 		secret = genSecret()
 		secrets[username] = secret
-		marshal(JSON_secrets, secrets)
+		marshal(SECRETS, secrets)
 	}
 
 	return decrypt(secret, keyGen(MASTER_PASSWORD))

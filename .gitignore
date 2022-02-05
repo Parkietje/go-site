@@ -1,3 +1,4 @@
 .DS_Store
 .env
-src/src
+app/app
+app/data/
