@@ -16,9 +16,10 @@
     </head>
     <body>
         {{template "header" .}}
-        <main>
+        <div class="container-1">
+            {{template "sidebar" .}}
             {{template "main" .}}
-        </main>
+        </div>
         {{template "footer" .}}
         <script src="/static/js/main.js" type="text/javascript"></script>
     </body>

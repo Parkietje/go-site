@@ -1,7 +1,6 @@
 package main
 
 import (
-	"embed"
 	"encoding/base64"
 	"html/template"
 	"log"
@@ -20,7 +19,7 @@ type User struct {
 
 type PageContent struct {
 	Navigation []Navitem
-	Messages   []Message
+	Sidebar    []Navitem
 	PNG        string
 }
 
@@ -41,15 +40,11 @@ const (
 )
 
 var (
-	DEFAULT_NAV     = []Navitem{{Title: "Login", Route: "/login"}}
-	AUTH_NAV        = []Navitem{{Title: "Logout", Route: "/login"}}
-	ADMIN_NAV       = []Navitem{{Title: "Admin", Route: "/admin"}, {Title: "Logout", Route: "/login"}}
+	DEFAULT_NAV     = []Navitem{{Title: "Home", Route: "/"}, {Title: "Login", Route: "/login"}}
+	AUTH_NAV        = []Navitem{{Title: "Home", Route: "/"}}
+	ADMIN_NAV       = []Navitem{{Title: "Home", Route: "/"}, {Title: "Admin", Route: "/admin"}}
 	DEFAULT_CONTENT = PageContent{Navigation: DEFAULT_NAV}
 	DEFAULT_CONTEXT = Context{User{}, DEFAULT_CONTENT}
-
-	// Holds our go UI templates
-	//go:embed ui/*
-	FS embed.FS
 )
 
 // get page context for current user
@@ -87,7 +82,7 @@ func render(file string, context Context, w http.ResponseWriter, r *http.Request
 
 //encode PNG to html-embeddable string
 func imgBase64Str(fileName string) (string, error) {
-	f, err := STATIC.ReadFile(fileName)
+	f, err := FS.ReadFile(fileName)
 	if err != nil {
 		return "", err
 	}

@@ -5,10 +5,13 @@
 {{end}}
 
 {{define "main"}}
-  {{template "hello" .}}
-  {{template "sidenav" .}}
+  {{template "admin-menu" .}}
+  <main>
+    {{template "admin-menu-data" .}}
+  </main>
 {{end}}
 
 {{define "script"}}
   {{template "hello-controller" .}}
+  {{template "admin-menu-controller" .}}
 {{end}}

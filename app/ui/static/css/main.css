@@ -23,8 +23,8 @@ header, nav, main, footer {
 
 main {
     margin-top: 54px;
-    margin-left: 200px;
     margin-bottom: 54px;
+    margin-left: 200px;
     min-height: calc(100vh - 345px);
     overflow: auto;
 }
@@ -78,7 +78,6 @@ header {
     overflow: auto;
     padding-top: 33px;
     padding-bottom: 27px;
-    text-align: center;
 }
 
 header a {
@@ -130,8 +129,6 @@ nav a.live:hover {
 }
 
 nav a.live:after {
-    content: '';
-    display: block;
     position: relative;
     left: calc(50% - 7px);
     top: 9px;
@@ -140,8 +137,6 @@ nav a.live:after {
     background: #F7F9FA;
     border-left: 1px solid #E4E5E7;
     border-bottom: 1px solid #E4E5E7;
-    -moz-transform: rotate(45deg);
-    -webkit-transform: rotate(-45deg);
 }
 
 a.button, input[type="submit"] {
@@ -314,4 +309,93 @@ footer {
     height: 60px;
     color: #6A6C6F;
     text-align: center;
+}
+
+/* split columns */
+
+.column {
+    float: left;
+}
+  
+.left {
+    width: 75%;
+}
+  
+.right {
+    width: 25%;
+
+/*Responsive layout - when the screen is less than 600px wide,
+make the two columns stack on top of each other instead of next to each other*/
+@media screen and (max-width: 600px) {
+    .column {
+      width: 100%;
+    }
+}}
+
+/* The side navigation menu */
+.sidebar {
+    margin: 0;
+    padding: 0;
+    width: 200px;
+    background-color: #34495E;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    overflow: auto;
+  }
+  
+  /* Sidebar links */
+  .sidebar a {
+    display: block;
+    color: #ced3db;
+    padding: 16px;
+    text-decoration: none;
+  }
+  
+  /* Active/current link */
+  .sidebar a.active {
+    background-color: #04AA6D;
+    color: white;
+  }
+  
+  /* Links on mouse-over */
+  .sidebar a:hover:not(.active) {
+    background-color: #6a839b;
+    color: white;
+  }
+  
+  /* Page content. The value of the margin-left property should match the value of the sidebar's width property */
+  div.content {
+    margin-left: 200px;
+    padding: 1px 16px;
+    height: 1000px;
+  }
+  
+  /* On screens that are less than 700px wide, make the sidebar into a topbar */
+  @media screen and (max-width: 700px) {
+    .sidebar {
+      width: 100%;
+      height: auto;
+      position: relative;
+    }
+    .sidebar a {float: left;}
+    div.content {margin-left: 0;}
+  }
+  
+  /* On screens that are less than 400px, display the bar vertically, instead of horizontally */
+  @media screen and (max-width: 400px) {
+    .sidebar a {
+      text-align: center;
+      float: none;
+    }
+  }
+
+  /* Right-aligned section inside the top navigation */
+.topnav-right {
+    float: right;
+}
+
+.container-1 {
+    position: relative
 }

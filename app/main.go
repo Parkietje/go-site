@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
@@ -22,8 +23,9 @@ var (
 	// used as secret key for data encryption
 	MASTER_PASSWORD string
 	// holds our static web server content.
-	//go:embed ui/static/*
-	STATIC embed.FS
+	//go:embed ui/*
+	FS        embed.FS
+	static, _ = fs.Sub(FS, "ui/static")
 )
 
 const (
@@ -71,7 +73,8 @@ func main() {
 
 	r := mux.NewRouter()
 
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.FS(STATIC))))
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.FS(static))))
+	//r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("ui/static/"))))
 	r.HandleFunc("/", home)
 	r.HandleFunc("/login", login)
 	r.HandleFunc("/logout", logout)

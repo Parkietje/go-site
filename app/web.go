@@ -12,7 +12,7 @@ import (
 )
 
 // cache to hold session cookies
-var CACHE = cache.New(5*time.Minute, 10*time.Minute)
+var CACHE = cache.New(5*time.Minute, 15*time.Minute)
 
 func home(w http.ResponseWriter, r *http.Request) {
 	context, auth := getContext(r)
@@ -64,7 +64,7 @@ func admin(w http.ResponseWriter, r *http.Request) {
 			r.ParseForm()
 			user := r.Form["username"][0]
 			password := r.Form["password"][0]
-			salt := r.Form["salt"][0]
+			salt := hash(genSecret(), "s@lty?")
 			addUser(user, password, salt)
 			fmt.Println("user added")
 
@@ -117,17 +117,17 @@ func verifySessionCookie(r *http.Request) (string, string, error) {
 func setSessionCookie(account string, token string, w http.ResponseWriter) {
 	// add username to cache
 	if account != "" {
-		CACHE.Set(account, token, 120*time.Second)
+		CACHE.Set(account, token, 15*time.Minute)
 	}
 	http.SetCookie(w, &http.Cookie{
 		Name:    "session_token",
 		Value:   token,
-		Expires: time.Now().Add(120 * time.Second),
+		Expires: time.Now().Add(15 * time.Minute),
 	})
 	http.SetCookie(w, &http.Cookie{
 		Name:    "account",
 		Value:   account,
-		Expires: time.Now().Add(120 * time.Second),
+		Expires: time.Now().Add(15 * time.Minute),
 	})
 }
 

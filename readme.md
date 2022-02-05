@@ -8,10 +8,10 @@ Using Go `html/template` package for server-side rendering of html templates and
 First, create a `.env` file inside `/app` directory:
 
 ```
-	$ 	cd app/ \
-		touch .env \ 
-		echo ADMIN="\"""\"" >> .env && \
-		echo ADMIN_PASSWORD="\"""\"" >> .env
+$ cd app/ \
+  touch .env \ 
+  echo ADMIN="\"""\"" >> .env && \
+  echo ADMIN_PASSWORD="\"""\"" >> .env
 ```
 
 After adding your credentials in `.env` build the app directory:
