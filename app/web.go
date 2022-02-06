@@ -1,9 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -20,6 +25,48 @@ func home(w http.ResponseWriter, r *http.Request) {
 		context.PageContent.PNG, _ = imgBase64Str("ui/static/img/pngegg.png")
 	}
 	render(HOME_template, context, w, r)
+}
+
+func deploy(w http.ResponseWriter, r *http.Request) {
+	context, auth := getContext(r)
+	if auth {
+		if r.Method == "POST" {
+			r.ParseMultipartForm(32 << 20) // limit your max input length!
+			var buf bytes.Buffer
+			file, header, err := r.FormFile("files[]")
+			if err != nil {
+				fmt.Printf(err.Error())
+				return
+			}
+			defer file.Close()
+			name := strings.Split(header.Filename, ".")
+			fmt.Printf("File name %s\n", name[0])
+			// Copy the file data to my buffer
+			io.Copy(&buf, file)
+			// do something with the contents...
+			// I normally have a struct defined and unmarshal into a struct, but this will
+			// work as an example
+			contents := buf.String()
+			fmt.Println(contents)
+			if _, err := os.Stat("data/blobs"); os.IsNotExist(err) {
+				os.Mkdir("data/blobs", 0777)
+			}
+			path := filepath.Join("data/blobs", name[0])
+			ioutil.WriteFile(path, []byte(contents), 0644)
+			// I reset the buffer in case I want to use it again
+			// reduces memory allocations in more intense projects
+			buf.Reset()
+
+			fmt.Printf("File written")
+
+			//upload to azure storage
+			uploadBlob(path)
+		}
+		render(DEPLOY_template, context, w, r)
+
+	} else {
+		render(HOME_template, context, w, r)
+	}
 }
 
 func login(w http.ResponseWriter, r *http.Request) {

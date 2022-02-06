@@ -34,15 +34,16 @@ type Message struct {
 }
 
 const (
-	HOME_template  = "ui/pages/home.gtpl"
-	LOGIN_template = "ui/pages/login.gtpl"
-	ADMIN_template = "ui/pages/admin.gtpl"
+	HOME_template   = "ui/pages/home.gtpl"
+	LOGIN_template  = "ui/pages/login.gtpl"
+	ADMIN_template  = "ui/pages/admin.gtpl"
+	DEPLOY_template = "ui/pages/deploy.gtpl"
 )
 
 var (
 	DEFAULT_NAV     = []Navitem{{Title: "Home", Route: "/"}, {Title: "Login", Route: "/login"}}
-	AUTH_NAV        = []Navitem{{Title: "Home", Route: "/"}}
-	ADMIN_NAV       = []Navitem{{Title: "Home", Route: "/"}, {Title: "Admin", Route: "/admin"}}
+	AUTH_NAV        = []Navitem{{Title: "Home", Route: "/"}, {Title: "Deployments", Route: "/deploy"}}
+	ADMIN_NAV       = []Navitem{{Title: "Home", Route: "/"}, {Title: "Deployments", Route: "/deploy"}, {Title: "Admin", Route: "/admin"}}
 	DEFAULT_CONTENT = PageContent{Navigation: DEFAULT_NAV}
 	DEFAULT_CONTEXT = Context{User{}, DEFAULT_CONTENT}
 )

@@ -13,8 +13,11 @@ import (
 )
 
 type Config struct {
-	ADMIN          string `cfgRequired:"true"`
-	ADMIN_PASSWORD string `cfgRequired:"true"`
+	ADMIN           string `cfgRequired:"true"`
+	ADMIN_PASSWORD  string `cfgRequired:"true"`
+	STORAGE_ACCOUNT string `cfgRequired:"False"`
+	CONTAINER_NAME  string `cfgRequired:"False"`
+	STORAGE_KEY     string `cfgRequired:"False"`
 }
 
 var (
@@ -53,6 +56,9 @@ func main() {
 
 	MASTER_PASSWORD = config.ADMIN_PASSWORD
 	ADMIN = config.ADMIN
+	STORAGE_ACCOUNT = config.STORAGE_ACCOUNT
+	STORAGE_KEY = config.STORAGE_KEY
+	CONTAINER_NAME = config.CONTAINER_NAME
 
 	// add admin credentials on first run
 	if _, err := os.Stat("data"); os.IsNotExist(err) {
@@ -79,6 +85,7 @@ func main() {
 	r.HandleFunc("/login", login)
 	r.HandleFunc("/logout", logout)
 	r.HandleFunc("/admin", admin)
+	r.HandleFunc("/deploy", deploy)
 	r.HandleFunc("/admin/{service}", admin)
 
 	log.Println("Starting server on :4000")

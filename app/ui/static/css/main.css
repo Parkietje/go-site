@@ -419,3 +419,11 @@ div.content {
     width: 50vw; /* you can use % */
     height: auto;
 }
+
+.center-data.hide {
+    display : none
+}
+
+.shiftleft{
+    margin-left: -10vw;
+}

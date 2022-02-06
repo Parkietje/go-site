@@ -7,7 +7,7 @@
 {{end}}
 
 {{define "admin-menu-data"}}
-        <div data-admin-menu-controller-target="add"; class="center-data">
+        <div data-admin-menu-controller-target="add"; class="center-data hide">
             <h2>Add user</h2>
             <form action="/admin/add" method="post">
                 Username:<input type="text" name="username">
@@ -16,7 +16,7 @@
             </form>
         </div>
 
-        <div data-admin-menu-controller-target="delete"; class="center-data">
+        <div data-admin-menu-controller-target="delete"; class="center-data hide">
             <h2>Delete user</h2>
             <form action="/admin/delete" method="post">
                 Username:<input type="text" name="hash">
@@ -31,22 +31,6 @@
         
       
         static targets = ["add", "delete"];
-  
-        // Called when Stimulus create an instance of the
-        // Controller class.
-        initialize(){
-            this._hideAll()
-        }
-
-        _hideAll() {
-    	    this.addTarget.style.display = "none"
-            this.deleteTarget.style.display = "none"
-        }
-  
-        // Called when the class is connected to the HTML element.
-        connect(){
-            console.log('hoi')
-        }
 
         // Called via:
         // data-action="click->admin-menu-controller#showAdd"

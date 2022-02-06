@@ -6,9 +6,9 @@
     <main>
         <div class="center-data">
             {{if .User.Account}}
-                <img src="data:image/png;base64,{{.PageContent.PNG}}" class="img-fluid image-dashboard resize" />
+                <img src="data:image/png;base64,{{.PageContent.PNG}}" class="img-fluid image-dashboard resize  shiftleft" />
             {{else}}
-                <p>There's nothing to see here yet!</p>
+                <p class="shiftleft">There's nothing to see here yet!</p>
             {{end}}
         </div>
     </main>
