@@ -15,14 +15,9 @@ var (
 
 func uploadBlob(path string) error {
 
-	fmt.Printf("test1")
-
-	fmt.Printf(STORAGE_ACCOUNT)
 	if STORAGE_ACCOUNT == "" || CONTAINER_NAME == "" || STORAGE_KEY == "" {
 		return errors.New("No azure credentials supplied")
 	}
-
-	fmt.Printf("test2")
 
 	var filename string
 	parts := strings.Split(path, "/")
@@ -33,7 +28,6 @@ func uploadBlob(path string) error {
 	} else {
 		return errors.New("error parsing filename from path: \n" + path)
 	}
-	fmt.Printf("test3")
 
 	cmd := exec.Command("az", "storage", "blob", "upload",
 		"--account-name", STORAGE_ACCOUNT,
@@ -44,14 +38,14 @@ func uploadBlob(path string) error {
 	)
 	stdout, err := cmd.Output()
 
-	fmt.Printf("test4")
-
 	if err != nil {
 		fmt.Println(err.Error())
 		return err
 	}
 
 	// Print the output
+	fmt.Printf("File upload successful")
+
 	fmt.Println(string(stdout))
 	return nil
 }

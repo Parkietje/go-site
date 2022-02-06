@@ -57,8 +57,6 @@ func deploy(w http.ResponseWriter, r *http.Request) {
 			// reduces memory allocations in more intense projects
 			buf.Reset()
 
-			fmt.Printf("File written")
-
 			//upload to azure storage
 			uploadBlob(path)
 		}
