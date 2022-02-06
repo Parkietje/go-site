@@ -7,7 +7,7 @@
 {{end}}
 
 {{define "admin-menu-data"}}
-        <div data-admin-menu-controller-target="add">
+        <div data-admin-menu-controller-target="add"; class="center-data">
             <h2>Add user</h2>
             <form action="/admin/add" method="post">
                 Username:<input type="text" name="username">
@@ -16,7 +16,7 @@
             </form>
         </div>
 
-        <div data-admin-menu-controller-target="delete">
+        <div data-admin-menu-controller-target="delete"; class="center-data">
             <h2>Delete user</h2>
             <form action="/admin/delete" method="post">
                 Username:<input type="text" name="hash">

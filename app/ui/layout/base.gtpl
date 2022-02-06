@@ -15,12 +15,16 @@
         </script>
     </head>
     <body>
-        {{template "header" .}}
-        <div class="container-1">
-            {{template "sidebar" .}}
-            {{template "main" .}}
+        <div class="page-container">
+            <div class="content-wrap">
+                {{template "header" .}}
+                <div class="container-1">
+                    {{template "sidebar" .}}
+                    {{template "main" .}}
+                </div>
+            </div>
+            {{template "footer" .}}
         </div>
-        {{template "footer" .}}
         <script src="/static/js/main.js" type="text/javascript"></script>
     </body>
 </html>

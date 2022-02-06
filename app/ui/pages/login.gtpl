@@ -5,17 +5,21 @@
 {{define "main"}}
     <main>
         {{if not .User.SessionCookie}}
-            <h2>Log in</h2>
-            <form action="/login" method="post">
-                Username:<input type="text" name="username">
-                Password:<input type="password" name="password">
-                <input type="submit" value="Login">
-            </form>
+            <div class="center-data">
+                <h2>Log in</h2>
+                <form action="/login" method="post">
+                    Username:<input type="text" name="username">
+                    Password:<input type="password" name="password">
+                    <input type="submit" value="Login">
+                </form>
+            </div>
         {{else}}
-            <h2>Log out</h2>
-            <form action="/logout">
-                <input type="submit" value="Logout" />
-            </form>
+            <div class="center-data">
+                <h2>Log out</h2>
+                <form action="/logout">
+                    <input type="submit" value="Logout" />
+                </form>
+            </div>
         {{end}}
     </main>
 {{end}}

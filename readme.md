@@ -1,6 +1,6 @@
 # Simple web app written in Go
 
-Using Go `html/template` package for server-side rendering of html templates and [some sprinkles javascript](https://stimulus.hotwired.dev/) for client-side interactivity.
+Using Go `html/template` package for server-side rendering of html templates and [some sprinkles of javascript](https://stimulus.hotwired.dev/) for client-side interactivity.
 
 
 
@@ -14,7 +14,7 @@ $ cd app/ \
   echo ADMIN_PASSWORD="\"""\"" >> .env
 ```
 
-After adding your credentials in `.env` build the app directory:
+After adding your credentials in `.env`, build the app directory:
 
 `$ go build .`
 
@@ -35,7 +35,7 @@ Refer to the [Go wiki](https://go.dev/doc/articles/wiki/) for more examples.
 
 ## Authentication
 
-Users can log in with a username and password. After authentication session cookies are used to get access to private content.
+Users can log in with a username and password. After authentication, session cookies are used to get access to private content.
 
 For now, usernames and passwords are encrypted and stored in files, which are embedded in the binary. The admin password is used as a secret key for encryption/decryption of account data.
 
