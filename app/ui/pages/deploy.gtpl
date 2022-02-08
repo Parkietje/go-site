@@ -3,13 +3,14 @@
 {{define "title"}}Deploy{{end}}
 
 {{define "main"}}
+    {{template "deploy"}}
     <main>
         <div class="center-data shiftleft">
-            {{template "file-upload"}}
+            {{template "deploy-data"}}
         </div>
     </main>
 {{end}}
 
 {{define "script"}}
-    {{template "file-upload-controller"}}
+    {{template "deploy-controller"}}
 {{end}}

@@ -5,13 +5,12 @@
 {{end}}
 
 {{define "main"}}
-  {{template "admin-menu" .}}
+  {{template "admin" .}}
   <main>
-    {{template "admin-menu-data" .}}
+    {{template "admin-data" .}}
   </main>
 {{end}}
 
 {{define "script"}}
-  {{template "hello-controller" .}}
-  {{template "admin-menu-controller" .}}
+  {{template "admin-controller" .}}
 {{end}}

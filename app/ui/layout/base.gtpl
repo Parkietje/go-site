@@ -19,7 +19,6 @@
             <div class="content-wrap">
                 {{template "header" .}}
                 <div class="container-1">
-                    {{template "sidebar" .}}
                     {{template "main" .}}
                 </div>
             </div>

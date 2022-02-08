@@ -39,8 +39,8 @@ func deploy(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			defer file.Close()
-			name := strings.Split(header.Filename, ".")
-			fmt.Printf("File name %s\n", name[0])
+			name := header.Filename
+			fmt.Printf("File name %s\n", name)
 			// Copy the file data to my buffer
 			io.Copy(&buf, file)
 			// do something with the contents...
@@ -51,7 +51,7 @@ func deploy(w http.ResponseWriter, r *http.Request) {
 			if _, err := os.Stat("data/blobs"); os.IsNotExist(err) {
 				os.Mkdir("data/blobs", 0777)
 			}
-			path := filepath.Join("data/blobs", name[0])
+			path := filepath.Join("data/blobs", name)
 			ioutil.WriteFile(path, []byte(contents), 0644)
 			// I reset the buffer in case I want to use it again
 			// reduces memory allocations in more intense projects

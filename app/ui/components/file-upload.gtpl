@@ -1,13 +1,8 @@
 {{define "file-upload"}}
     <div data-controller="file-upload">
-
         <label> Choose the File to upload: </label>
         <input type="file" id="file-to-upload" /> <br /><br />
-        <input type="submit"  value="submit"/>
         <button data-action="click->file-upload#getFile">Submit</button>
-
-        
-
     </div>
 {{end}}
 
