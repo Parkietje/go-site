@@ -25,7 +25,7 @@
                 formData.append('files[]', file)
             }
 
-            fetch('http://localhost:4000/deploy', {method: 'POST',body: formData}).then(
+            fetch('http://localhost:4000/deploy/upload', {method: 'POST',body: formData}).then(
                 (response) => {console.log(response)}
             )
         }

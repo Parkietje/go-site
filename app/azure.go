@@ -49,3 +49,28 @@ func uploadBlob(path string) error {
 	fmt.Println(string(stdout))
 	return nil
 }
+
+func listBlobs() error {
+
+	if STORAGE_ACCOUNT == "" || CONTAINER_NAME == "" || STORAGE_KEY == "" {
+		return errors.New("No azure credentials supplied")
+	}
+
+	cmd := exec.Command("az", "storage", "blob", "list",
+		"--account-name", STORAGE_ACCOUNT,
+		"--container-name", CONTAINER_NAME,
+		"--account-key", STORAGE_KEY,
+	)
+	stdout, err := cmd.Output()
+
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+
+	// Print the output
+	fmt.Printf("List blobs successful")
+
+	fmt.Println(string(stdout))
+	return nil
+}

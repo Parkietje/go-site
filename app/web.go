@@ -31,34 +31,45 @@ func deploy(w http.ResponseWriter, r *http.Request) {
 	context, auth := getContext(r)
 	if auth {
 		if r.Method == "POST" {
-			r.ParseMultipartForm(32 << 20) // limit your max input length!
-			var buf bytes.Buffer
-			file, header, err := r.FormFile("files[]")
-			if err != nil {
-				fmt.Printf(err.Error())
-				return
+			urlparts := strings.Split(r.RequestURI, "/")
+			var service string
+			if len(urlparts) >= 3 {
+				service = urlparts[2]
 			}
-			defer file.Close()
-			name := header.Filename
-			fmt.Printf("File name %s\n", name)
-			// Copy the file data to my buffer
-			io.Copy(&buf, file)
-			// do something with the contents...
-			// I normally have a struct defined and unmarshal into a struct, but this will
-			// work as an example
-			contents := buf.String()
-			fmt.Println(contents)
-			if _, err := os.Stat("data/blobs"); os.IsNotExist(err) {
-				os.Mkdir("data/blobs", 0777)
-			}
-			path := filepath.Join("data/blobs", name)
-			ioutil.WriteFile(path, []byte(contents), 0644)
-			// I reset the buffer in case I want to use it again
-			// reduces memory allocations in more intense projects
-			buf.Reset()
+			switch service {
 
-			//upload to azure storage
-			uploadBlob(path)
+			case "upload":
+				r.ParseMultipartForm(32 << 20) // limit your max input length!
+				var buf bytes.Buffer
+				file, header, err := r.FormFile("files[]")
+				if err != nil {
+					fmt.Printf(err.Error())
+					return
+				}
+				defer file.Close()
+				name := header.Filename
+				fmt.Printf("File name %s\n", name)
+				// Copy the file data to my buffer
+				io.Copy(&buf, file)
+				// do something with the contents...
+				// I normally have a struct defined and unmarshal into a struct, but this will
+				// work as an example
+				contents := buf.String()
+				fmt.Println(contents)
+				if _, err := os.Stat("data/blobs"); os.IsNotExist(err) {
+					os.Mkdir("data/blobs", 0777)
+				}
+				path := filepath.Join("data/blobs", name)
+				ioutil.WriteFile(path, []byte(contents), 0644)
+				// I reset the buffer in case I want to use it again
+				// reduces memory allocations in more intense projects
+				buf.Reset()
+
+				//upload to azure storage
+				uploadBlob(path)
+			case "list":
+				listBlobs()
+			}
 		}
 		render(DEPLOY_template, context, w, r)
 

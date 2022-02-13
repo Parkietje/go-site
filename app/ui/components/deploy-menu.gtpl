@@ -12,11 +12,7 @@
         </div>
 
         <div data-deploy-target="overview"; class="center-data hide">
-            <h2>Overview</h2>
-            <form action="/admin/delete" method="post">
-                Username:<input type="text" name="hash">
-                <input type="submit" value="Delete user">
-            </form>
+            {{template "list-blobs" .}}
         </div>
     </div>
 {{end}}
@@ -46,4 +42,5 @@
         }     
     })
     {{template "file-upload-controller" .}}
+    {{template "list-blobs-controller" .}}
 {{end}}
