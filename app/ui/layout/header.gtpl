@@ -2,7 +2,7 @@
     <header>
         <div class="row">
             <div class="column">
-                <h1><a href='/'>Krakhol</a></h1>
+                <h1><a href='/'>Pipelines</a></h1>
             </div>
             <div class="column">
             </div>
