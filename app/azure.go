@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+
+	"github.com/tidwall/gjson"
 )
 
 var (
@@ -50,10 +52,11 @@ func uploadBlob(path string) error {
 	return nil
 }
 
-func listBlobs() error {
+func listBlobs() (string, error) {
+	result := ""
 
 	if STORAGE_ACCOUNT == "" || CONTAINER_NAME == "" || STORAGE_KEY == "" {
-		return errors.New("No azure credentials supplied")
+		return result, errors.New("No azure credentials supplied")
 	}
 
 	cmd := exec.Command("az", "storage", "blob", "list",
@@ -65,12 +68,16 @@ func listBlobs() error {
 
 	if err != nil {
 		fmt.Println(err.Error())
-		return err
+		return result, err
 	}
 
 	// Print the output
-	fmt.Printf("List blobs successful")
+	fmt.Println("List blobs successful")
 
 	fmt.Println(string(stdout))
-	return nil
+
+	values := gjson.Get(string(stdout), "#.name")
+	println(values.String())
+
+	return values.String(), nil
 }

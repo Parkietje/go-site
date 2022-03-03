@@ -1,0 +1,19 @@
+{{define "list-blobs"}}
+    <div data-controller="list-blobs">
+        <button data-action="click->list-blobs#listBlobs">List blobs</button>
+    </div>
+{{end}}
+
+{{define "list-blobs-controller"}}
+    Stimulus.register("list-blobs", class extends Controller {
+        
+        listBlobs() {
+            console.log("test")
+
+
+            fetch('http://localhost:4000/deploy/list', {method: 'POST'}).then(
+                (response) => {alert(response)}
+            )
+        }
+    })
+{{end}}

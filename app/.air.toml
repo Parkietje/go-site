@@ -2,18 +2,18 @@
 
 # Working directory
 # . or absolute path, please note that the directories following must be under root.
-root = "/Users/parkietje/Desktop/site/app"
+root = "C:/Users/YanniChiodi/Code/go-site/app"
 tmp_dir = "tmp"
 
 [build]
 # Just plain old shell command. You could use `make` as well.
-cmd = "go build -o tmp/app ."
+cmd = "go build -o tmp/app.exe ."
 # Binary file yields from `cmd`.
-bin = "tmp/app"
+bin = "tmp/app.exe"
 # Customize binary, can setup environment variables when run your app.
-full_bin = "./tmp/app"
+full_bin = "./tmp/app.exe"
 # Watch these filename extensions.
-include_ext = ["go", "gtpl", "css", "json"]
+include_ext = ["go", "gohtml", "css", "json"]
 # Ignore these filename extensions or directories.
 exclude_dir = ["tmp"]
 # Watch these directories if you specified.

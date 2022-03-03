@@ -6,6 +6,8 @@ app/app
 
 # generated
 app/data/
+tmp/
+app/tmp
 
 # OSX files
 .DS_Store

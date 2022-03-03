@@ -55,7 +55,6 @@ func deploy(w http.ResponseWriter, r *http.Request) {
 				// I normally have a struct defined and unmarshal into a struct, but this will
 				// work as an example
 				contents := buf.String()
-				fmt.Println(contents)
 				if _, err := os.Stat("data/blobs"); os.IsNotExist(err) {
 					os.Mkdir("data/blobs", 0777)
 				}
@@ -68,7 +67,10 @@ func deploy(w http.ResponseWriter, r *http.Request) {
 				//upload to azure storage
 				uploadBlob(path)
 			case "list":
-				listBlobs()
+				s, e := listBlobs()
+				if e != nil {
+					fmt.Fprintf(w, s)
+				}
 			}
 		}
 		render(DEPLOY_template, context, w, r)

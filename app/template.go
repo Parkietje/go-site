@@ -34,10 +34,10 @@ type Message struct {
 }
 
 const (
-	HOME_template   = "ui/pages/home.gtpl"
-	LOGIN_template  = "ui/pages/login.gtpl"
-	ADMIN_template  = "ui/pages/admin.gtpl"
-	DEPLOY_template = "ui/pages/deploy.gtpl"
+	HOME_template   = "ui/pages/home.gohtml"
+	LOGIN_template  = "ui/pages/login.gohtml"
+	ADMIN_template  = "ui/pages/admin.gohtml"
+	DEPLOY_template = "ui/pages/deploy.gohtml"
 )
 
 var (
@@ -68,7 +68,7 @@ func getContext(r *http.Request) (Context, bool) {
 
 // parse html templates and execute response
 func render(file string, context Context, w http.ResponseWriter, r *http.Request) {
-	ts, err := template.ParseFS(FS, file, "ui/layout/*.gtpl", "ui/components/*.gtpl")
+	ts, err := template.ParseFS(FS, file, "ui/layout/*.gohtml", "ui/components/*.gohtml")
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, "Internal Server Error", 500)
