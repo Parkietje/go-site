@@ -24,7 +24,7 @@ Finally, exectute the resulting binary:
 
 ## Templates
 
-The template files, ending in`.gtpl`, inside the `/ui` directory contain plain html, enriched with Go template tags to dynamically generate the UI.
+The template files, ending in`.gohtml`, inside the `/ui` directory contain plain html, enriched with Go template tags to dynamically generate the UI.
 
 
 The example below shows the definition of a *base* html template, that is populated with content defined in *title*, *header*, *main*, and *footer* templates. 

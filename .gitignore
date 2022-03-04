@@ -3,6 +3,7 @@
 
 # binary
 app/app
+app/app.exe
 
 # generated
 app/data/

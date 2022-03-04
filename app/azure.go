@@ -25,8 +25,9 @@ func uploadBlob(path string) error {
 	parts := strings.Split(path, "/")
 	if len(parts) > 1 {
 		filename = parts[len(parts)-1]
-	} else if len(parts) == 1 {
-		filename = parts[0]
+	} else if len(parts) == 1 { // windows path
+		parts = strings.Split(path, "\\")
+		filename = parts[len(parts)-1]
 	} else {
 		return errors.New("error parsing filename from path: \n" + path)
 	}
