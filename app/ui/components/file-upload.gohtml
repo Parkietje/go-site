@@ -10,7 +10,6 @@
     Stimulus.register("file-upload", class extends Controller {
         
         getFile() {
-            console.log("test")
             var fullPath = document.getElementById('file-to-upload').value;
             
             console.log(fullPath)
@@ -25,7 +24,7 @@
                 formData.append('files[]', file)
             }
 
-            fetch('http://localhost:4000/deploy/upload', {method: 'POST',body: formData}).then(
+            fetch('http://localhost:8000/upload', {method: 'POST',body: formData}).then(
                 (response) => {console.log(response)}
             )
         }

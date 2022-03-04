@@ -70,12 +70,6 @@ func listBlobs() (string, error) {
 		fmt.Println(err.Error())
 		return result, err
 	}
-
-	// Print the output
-	fmt.Println("List blobs successful")
-
-	fmt.Println(string(stdout))
-
 	values := gjson.Get(string(stdout), "#.name")
 	println(values.String())
 

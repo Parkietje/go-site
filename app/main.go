@@ -80,16 +80,17 @@ func main() {
 	r := mux.NewRouter()
 
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.FS(static))))
-	//r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("ui/static/"))))
 	r.HandleFunc("/", home)
 	r.HandleFunc("/login", login)
 	r.HandleFunc("/logout", logout)
 	r.HandleFunc("/admin", admin)
 	r.HandleFunc("/admin/{service}", admin)
 	r.HandleFunc("/deploy", deploy)
+	r.HandleFunc("/list", list)
+	r.HandleFunc("/upload", upload)
 	r.HandleFunc("/deploy/{command}", deploy)
 
-	log.Println("Starting server on :4000")
-	err = http.ListenAndServe(":4000", r)
+	log.Println("Starting server on :8000")
+	err = http.ListenAndServe(":8000", r)
 	log.Fatal(err)
 }

@@ -1,14 +1,12 @@
 package main
 
 import (
-	"bytes"
+	"encoding/base64"
 	"errors"
 	"fmt"
-	"io"
-	"io/ioutil"
+	"html/template"
+	"log"
 	"net/http"
-	"os"
-	"path/filepath"
 	"strings"
 	"time"
 
@@ -16,8 +14,46 @@ import (
 	"github.com/patrickmn/go-cache"
 )
 
-// cache to hold session cookies
-var CACHE = cache.New(5*time.Minute, 15*time.Minute)
+type Context struct {
+	User
+	PageContent
+}
+
+type User struct {
+	Account       string
+	SessionCookie string
+}
+
+type PageContent struct {
+	Navigation []Navitem
+	Sidebar    []Navitem
+	PNG        string
+}
+
+type Navitem struct {
+	Title string
+	Route string
+}
+
+type Message struct {
+	Title string
+	Text  string
+}
+
+const (
+	HOME_template   = "ui/pages/home.gohtml"
+	LOGIN_template  = "ui/pages/login.gohtml"
+	ADMIN_template  = "ui/pages/admin.gohtml"
+	DEPLOY_template = "ui/pages/deploy.gohtml"
+)
+
+var (
+	DEFAULT_NAV     = []Navitem{{Title: "Home", Route: "/"}, {Title: "Login", Route: "/login"}}
+	AUTH_NAV        = []Navitem{{Title: "Home", Route: "/"}, {Title: "Deployments", Route: "/deploy"}}
+	ADMIN_NAV       = []Navitem{{Title: "Home", Route: "/"}, {Title: "Deployments", Route: "/deploy"}, {Title: "Admin", Route: "/admin"}}
+	DEFAULT_CONTENT = PageContent{Navigation: DEFAULT_NAV}
+	DEFAULT_CONTEXT = Context{User{}, DEFAULT_CONTENT}
+)
 
 func home(w http.ResponseWriter, r *http.Request) {
 	context, auth := getContext(r)
@@ -30,51 +66,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 func deploy(w http.ResponseWriter, r *http.Request) {
 	context, auth := getContext(r)
 	if auth {
-		if r.Method == "POST" {
-			urlparts := strings.Split(r.RequestURI, "/")
-			var service string
-			if len(urlparts) >= 3 {
-				service = urlparts[2]
-			}
-			switch service {
-
-			case "upload":
-				r.ParseMultipartForm(32 << 20) // limit your max input length!
-				var buf bytes.Buffer
-				file, header, err := r.FormFile("files[]")
-				if err != nil {
-					fmt.Printf(err.Error())
-					return
-				}
-				defer file.Close()
-				name := header.Filename
-				fmt.Printf("File name %s\n", name)
-				// Copy the file data to my buffer
-				io.Copy(&buf, file)
-				// do something with the contents...
-				// I normally have a struct defined and unmarshal into a struct, but this will
-				// work as an example
-				contents := buf.String()
-				if _, err := os.Stat("data/blobs"); os.IsNotExist(err) {
-					os.Mkdir("data/blobs", 0777)
-				}
-				path := filepath.Join("data/blobs", name)
-				ioutil.WriteFile(path, []byte(contents), 0644)
-				// I reset the buffer in case I want to use it again
-				// reduces memory allocations in more intense projects
-				buf.Reset()
-
-				//upload to azure storage
-				uploadBlob(path)
-			case "list":
-				s, e := listBlobs()
-				if e != nil {
-					fmt.Fprintf(w, s)
-				}
-			}
-		}
 		render(DEPLOY_template, context, w, r)
-
 	} else {
 		render(HOME_template, context, w, r)
 	}
@@ -147,6 +139,51 @@ func logout(w http.ResponseWriter, r *http.Request) {
 	}
 	login(w, r)
 }
+
+// parse html templates and execute response
+func render(file string, context Context, w http.ResponseWriter, r *http.Request) {
+	ts, err := template.ParseFS(FS, file, "ui/layout/*.gohtml", "ui/components/*.gohtml")
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "Internal Server Error", 500)
+	}
+
+	err = ts.Execute(w, context)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "Internal Server Error", 500)
+	}
+}
+
+// get page context for current user
+func getContext(r *http.Request) (Context, bool) {
+	context := DEFAULT_CONTEXT
+	account, sc, err := verifySessionCookie(r)
+	if err != nil {
+		return context, false
+	} else {
+		context.User = User{Account: account, SessionCookie: sc}
+		if account == ADMIN {
+			context.PageContent.Navigation = ADMIN_NAV
+			return context, true
+		} else {
+			context.PageContent.Navigation = AUTH_NAV
+			return context, true
+		}
+	}
+}
+
+//encode PNG to html-embeddable string
+func imgBase64Str(fileName string) (string, error) {
+	f, err := FS.ReadFile(fileName)
+	if err != nil {
+		return "", err
+	}
+	return base64.StdEncoding.EncodeToString(f), nil
+}
+
+// cache to hold session cookies
+var CACHE = cache.New(5*time.Minute, 15*time.Minute)
 
 func verifySessionCookie(r *http.Request) (string, string, error) {
 	c, err := r.Cookie("account")

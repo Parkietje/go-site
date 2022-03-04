@@ -8,12 +8,9 @@
     Stimulus.register("list-blobs", class extends Controller {
         
         listBlobs() {
-            console.log("test")
-
-
-            fetch('http://localhost:4000/deploy/list', {method: 'POST'}).then(
-                (response) => {alert(response)}
-            )
+            fetch('http://localhost:8000/list')
+            .then(response => response.text())
+            .then(data => console.log(data))
         }
     })
 {{end}}
