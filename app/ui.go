@@ -35,11 +35,6 @@ type Navitem struct {
 	Route string
 }
 
-type Message struct {
-	Title string
-	Text  string
-}
-
 const (
 	HOME_template   = "ui/pages/home.gohtml"
 	LOGIN_template  = "ui/pages/login.gohtml"
@@ -61,15 +56,6 @@ func home(w http.ResponseWriter, r *http.Request) {
 		context.PageContent.PNG, _ = imgBase64Str("ui/static/img/pngegg.png")
 	}
 	render(HOME_template, context, w, r)
-}
-
-func deploy(w http.ResponseWriter, r *http.Request) {
-	context, auth := getContext(r)
-	if auth {
-		render(DEPLOY_template, context, w, r)
-	} else {
-		render(HOME_template, context, w, r)
-	}
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
@@ -97,6 +83,14 @@ func login(w http.ResponseWriter, r *http.Request) {
 			render(HOME_template, context, w, r)
 		}
 	}
+}
+
+func logout(w http.ResponseWriter, r *http.Request) {
+	account, _, err := verifySessionCookie(r)
+	if err == nil {
+		deleteSessionCookie(account, w)
+	}
+	login(w, r)
 }
 
 func admin(w http.ResponseWriter, r *http.Request) {
@@ -132,12 +126,13 @@ func admin(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func logout(w http.ResponseWriter, r *http.Request) {
-	account, _, err := verifySessionCookie(r)
-	if err == nil {
-		deleteSessionCookie(account, w)
+func deploy(w http.ResponseWriter, r *http.Request) {
+	context, auth := getContext(r)
+	if auth {
+		render(DEPLOY_template, context, w, r)
+	} else {
+		render(HOME_template, context, w, r)
 	}
-	login(w, r)
 }
 
 // parse html templates and execute response

@@ -5,6 +5,7 @@
         <meta charset='utf-8'>
         <title>{{template "title" .}}</title>
         <link rel='stylesheet' href='/static/css/main.css'>
+        <link rel='stylesheet' href='/static/css/fonts.css'>
         <link rel='shortcut icon' href='/static/img/favicon.ico' type='image/x-icon'>
         <script type="module">
             import {Application, Controller} from "/static/js/stimulus.js"
@@ -16,9 +17,9 @@
         <div class="page-container">
             <div class="content-wrap">
                 {{template "header" .}}
-                <div class="container-1">
+                <main>
                     {{template "main" .}}
-                </div>
+                </main>
             </div>
             {{template "footer" .}}
         </div>

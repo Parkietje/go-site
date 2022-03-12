@@ -2,7 +2,7 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-size: 18px;
+    font-size: 6vw;
     font-family: "Ubuntu Mono", monospace;
 }
 
@@ -22,19 +22,19 @@ header, nav, main, footer {
 }
 
 main {
-    margin-left: 200px;
+    margin-left: 5vw;
     min-height: calc(100vh - 345px);
     overflow: auto;
 }
 
 h1 a {
-    font-size: 36px;
+    font-size: 10vw;
     font-weight: bold;
     background-image: url("/static/img/logo.png");
     background-repeat: no-repeat;
     background-position: 0px 0px;
-    height: 36px;
-    padding-left: 50px;
+    height: 10vw;
+    padding-left: 10vw;
     position: relative;
 }
 
@@ -44,10 +44,9 @@ h1 a:hover {
 }
 
 h2 {
-    font-size: 22px;
-    margin-bottom: 36px;
+    font-size: 8vw;
+    margin-bottom: 5vw;
     position: relative;
-    top: -9px;
 }
 
 a {
@@ -61,21 +60,21 @@ a:hover {
 }
 
 textarea, input:not([type="submit"]) {
-    font-size: 18px;
+    font-size: 6vw;
     font-family: "Ubuntu Mono", monospace;
 }
 
 header {
-    background-image: -webkit-linear-gradient(left, #34495e, #34495e 25%, #9b59b6 25%, #9b59b6 35%, #3498db 35%, #3498db 45%, #62cb31 45%, #62cb31 55%, #ffb606 55%, #ffb606 65%, #e67e22 65%, #e67e22 75%, #e74c3c 85%, #e74c3c 85%, #c0392b 85%, #c0392b 100%);
-    background-image: -moz-linear-gradient(left, #34495e, #34495e 25%, #9b59b6 25%, #9b59b6 35%, #3498db 35%, #3498db 45%, #62cb31 45%, #62cb31 55%, #ffb606 55%, #ffb606 65%, #e67e22 65%, #e67e22 75%, #e74c3c 85%, #e74c3c 85%, #c0392b 85%, #c0392b 100%);
-    background-image: -ms-linear-gradient(left, #34495e, #34495e 25%, #9b59b6 25%, #9b59b6 35%, #3498db 35%, #3498db 45%, #62cb31 45%, #62cb31 55%, #ffb606 55%, #ffb606 65%, #e67e22 65%, #e67e22 75%, #e74c3c 85%, #e74c3c 85%, #c0392b 85%, #c0392b 100%);
-    background-image: linear-gradient(to right, #34495e, #34495e 25%, #9b59b6 25%, #9b59b6 35%, #3498db 35%, #3498db 45%, #62cb31 45%, #62cb31 55%, #ffb606 55%, #ffb606 65%, #e67e22 65%, #e67e22 75%, #e74c3c 85%, #e74c3c 85%, #c0392b 85%, #c0392b 100%);
-    background-size: 100% 6px;
+    background-image: -webkit-linear-gradient(left, #34495e, #34495e 14%, #9b59b6 14%, #9b59b6 29%, #3498db 29%, #3498db 43%, #62cb31 43%, #62cb31 58%, #ffb606 58%, #ffb606 72%, #e67e22 72%, #e67e22 87%, #e74c3c 87%, #e74c3c 100%);
+    background-image: -moz-linear-gradient(left,    #34495e, #34495e 14%, #9b59b6 14%, #9b59b6 29%, #3498db 29%, #3498db 43%, #62cb31 43%, #62cb31 58%, #ffb606 58%, #ffb606 72%, #e67e22 72%, #e67e22 87%, #e74c3c 87%, #e74c3c 100%);
+    background-image: -ms-linear-gradient(left,     #34495e, #34495e 14%, #9b59b6 14%, #9b59b6 29%, #3498db 29%, #3498db 43%, #62cb31 43%, #62cb31 58%, #ffb606 58%, #ffb606 72%, #e67e22 72%, #e67e22 87%, #e74c3c 87%, #e74c3c 100%);
+    background-image: linear-gradient(to right,     #34495e, #34495e 14%, #9b59b6 14%, #9b59b6 29%, #3498db 29%, #3498db 43%, #62cb31 43%, #62cb31 58%, #ffb606 58%, #ffb606 72%, #e67e22 72%, #e67e22 87%, #e74c3c 87%, #e74c3c 100%);
+    background-size: 100% 3vw;
     background-repeat: no-repeat;
-    border-bottom: 1px solid #E4E5E7;
+    border-bottom: 1vw solid #E4E5E7;
     overflow: auto;
-    padding-top: 33px;
-    padding-bottom: 27px;
+    padding-top: 10vw;
+    padding-bottom: 9vw;
 }
 
 header a {
@@ -85,16 +84,17 @@ header a {
 
 
 nav {
-    border-bottom: 1px solid #E4E5E7;
-    padding-top: 17px;
-    padding-bottom: 15px;
+    border-bottom: 1vw solid #E4E5E7;
+    padding-top: 1vw;
+    padding-bottom: 1vw;
     background: #F7F9FA;
-    height: 60px;
+    min-height: 2rem;
     color: #6A6C6F;
 }
 
 nav a {
     margin-right: 1.5em;
+    min-width: 2rem;
     display: inline-block;
 }
 
@@ -335,9 +335,9 @@ make the two columns stack on top of each other instead of next to each other*/
 .sidebar {
     margin: 0;
     padding: 0;
-    width: 200px;
+    width: 25vw;
     background-color: #34495E;
-    position: absolute;
+    position: relative;
     top: 0;
     left: 0;
     height: 100%;
@@ -348,7 +348,7 @@ make the two columns stack on top of each other instead of next to each other*/
 .sidebar a {
     display: block;
     color: #ced3db;
-    padding: 16px;
+    padding: 1vw;
     text-decoration: none;
 }
   
@@ -366,30 +366,9 @@ make the two columns stack on top of each other instead of next to each other*/
   
   /* Page content. The value of the margin-left property should match the value of the sidebar's width property */
 div.content {
-    margin-left: 200px;
-    padding: 1px 16px;
-    height: 1000px;
-}
-  
-/* On screens that are less than 700px wide, make the sidebar into a topbar */
-@media screen and (max-width: 700px) {
-    .sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-    }
-    
-    .sidebar a {float: left;}
-    
-    div.content {margin-left: 0;}
-}
-  
-/* On screens that are less than 400px, display the bar vertically, instead of horizontally */
-@media screen and (max-width: 400px) {
-    .sidebar a {
-        text-align: center;
-        float: none;
-    }
+    margin-left: 2vw;
+    padding: 1vw 3vw;
+    height: 100vw;
 }
 
 /* Right-aligned section inside the top navigation */
@@ -411,117 +390,10 @@ div.content {
 }
 
 .center-data {
-    padding-top: 33px;
-    padding-bottom: 27px;
-}
-
-.resize {
-    width: 50vw; /* you can use % */
-    height: auto;
+    padding-top: 3vw;
+    padding-bottom: 2vw;
 }
 
 .center-data.hide {
     display : none
 }
-
-.shiftleft{
-    margin-left: -10vw;
-}
-
-/* FONT SECTION */
-/* cyrillic-ext */
-@font-face {
-    font-family: 'Ubuntu Mono';
-    font-style: normal;
-    font-weight: 400;
-    src: url(../fonts/KFOjCneDtsqEr0keqCMhbCc3CsTKlA.woff2) format('woff2');
-    unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
-  }
-  /* cyrillic */
-  @font-face {
-    font-family: 'Ubuntu Mono';
-    font-style: normal;
-    font-weight: 400;
-    src: url(../fonts/KFOjCneDtsqEr0keqCMhbCc-CsTKlA.woff2) format('woff2');
-    unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-  }
-  /* greek-ext */
-  @font-face {
-    font-family: 'Ubuntu Mono';
-    font-style: normal;
-    font-weight: 400;
-    src: url(../fonts/KFOjCneDtsqEr0keqCMhbCc2CsTKlA.woff2) format('woff2');
-    unicode-range: U+1F00-1FFF;
-  }
-  /* greek */
-  @font-face {
-    font-family: 'Ubuntu Mono';
-    font-style: normal;
-    font-weight: 400;
-    src: url(../fonts/KFOjCneDtsqEr0keqCMhbCc5CsTKlA.woff2) format('woff2');
-    unicode-range: U+0370-03FF;
-  }
-  /* latin-ext */
-  @font-face {
-    font-family: 'Ubuntu Mono';
-    font-style: normal;
-    font-weight: 400;
-    src: url(../fonts/KFOjCneDtsqEr0keqCMhbCc0CsTKlA.woff2) format('woff2');
-    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
-  }
-  /* latin */
-  @font-face {
-    font-family: 'Ubuntu Mono';
-    font-style: normal;
-    font-weight: 400;
-    src: url(../fonts/KFOjCneDtsqEr0keqCMhbCc6CsQ.woff2) format('woff2');
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-  }
-  /* cyrillic-ext */
-  @font-face {
-    font-family: 'Ubuntu Mono';
-    font-style: normal;
-    font-weight: 700;
-    src: url(../fonts/KFO-CneDtsqEr0keqCMhbC-BL9H4tY12eg.woff2) format('woff2');
-    unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
-  }
-  /* cyrillic */
-  @font-face {
-    font-family: 'Ubuntu Mono';
-    font-style: normal;
-    font-weight: 700;
-    src: url(../fonts/KFO-CneDtsqEr0keqCMhbC-BL9HxtY12eg.woff2) format('woff2');
-    unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-  }
-  /* greek-ext */
-  @font-face {
-    font-family: 'Ubuntu Mono';
-    font-style: normal;
-    font-weight: 700;
-    src: url(../fonts/KFO-CneDtsqEr0keqCMhbC-BL9H5tY12eg.woff2) format('woff2');
-    unicode-range: U+1F00-1FFF;
-  }
-  /* greek */
-  @font-face {
-    font-family: 'Ubuntu Mono';
-    font-style: normal;
-    font-weight: 700;
-    src: url(../fonts/KFO-CneDtsqEr0keqCMhbC-BL9H2tY12eg.woff2) format('woff2');
-    unicode-range: U+0370-03FF;
-  }
-  /* latin-ext */
-  @font-face {
-    font-family: 'Ubuntu Mono';
-    font-style: normal;
-    font-weight: 700;
-    src: url(../fonts/KFO-CneDtsqEr0keqCMhbC-BL9H7tY12eg.woff2) format('woff2');
-    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
-  }
-  /* latin */
-  @font-face {
-    font-family: 'Ubuntu Mono';
-    font-style: normal;
-    font-weight: 700;
-    src: url(../fonts/KFO-CneDtsqEr0keqCMhbC-BL9H1tY0.woff2) format('woff2');
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-  }

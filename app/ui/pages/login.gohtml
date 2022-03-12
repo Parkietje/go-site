@@ -3,25 +3,19 @@
 {{define "title"}}Login{{end}}
 
 {{define "main"}}
-    <main>
         {{if not .User.SessionCookie}}
-            <div class="center-data shiftleft">
-                <h2>Log in</h2>
-                <form action="/login" method="post">
-                    Username:<input type="text" name="username">
-                    Password:<input type="password" name="password">
-                    <input type="submit" value="Login">
-                </form>
-            </div>
+            <h2>Log in</h2>
+            <form action="/login" method="post">
+                Username:<input type="text" name="username">
+                Password:<input type="password" name="password">
+                <input type="submit" value="Login">
+            </form>
         {{else}}
-            <div class="center-data shiftleft">
-                <h2>Log out</h2>
-                <form action="/logout">
-                    <input type="submit" value="Logout" />
-                </form>
-            </div>
+            <h2>Log out</h2>
+            <form action="/logout">
+                <input type="submit" value="Logout" />
+            </form>
         {{end}}
-    </main>
 {{end}}
 {{define "script"}}
 
