@@ -1,23 +1,24 @@
 {{define "header"}}
     <header>
-        <div class="row">
-            <div class="column">
-                <h1><a href='/'>Pipelines</a></h1>
+        <h1>
+            <div class="header-container">
+                <div class="logo"></div>
+                <div class="topnav-left">
+                    <a href='/'>Pipelines</a>
+                </div>
+                {{if .User.Account}}
+                    <div class="topnav-right">
+                        <a href='/login'>Log out</a>
+                    </div>    
+                {{end}}
             </div>
-            <div class="column">
-            </div>
-        </div>
+        </h1>
     </header>
         <nav>
             {{if .PageContent.Navigation}}
                 {{range .PageContent.Navigation}}
                     <a href='{{.Route}}'>{{.Title}}</a>
                 {{end}}
-            {{end}}
-            {{if .User.Account}}
-                <div class="topnav-right">
-                    <a href='/login'>Logged in as: {{.User.Account}}</a>
-                </div>    
             {{end}}
         </nav>
 {{end}}

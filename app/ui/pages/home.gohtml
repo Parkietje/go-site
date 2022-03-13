@@ -4,7 +4,7 @@
 
 {{define "main"}}
         {{if .User.Account}}
-            <img src="data:image/png;base64,{{.PageContent.PNG}}" class="img-fluid image-dashboard resize  shiftleft" />
+            <img src="data:image/png;base64,{{.PageContent.PNG}}"/>
         {{else}}
             <p class="shiftleft">There's nothing to see here yet!</p>
         {{end}}
