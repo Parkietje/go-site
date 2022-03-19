@@ -14,16 +14,15 @@
         </script>
     </head>
     <body>
-        <div class="page-container">
-            <div class="content-wrap">
-                {{template "header" .}}
-                <main>
-                    {{template "main" .}}
-                </main>
-            </div>
-            {{template "footer" .}}
-        </div>
-        <script src="/static/js/main.js" type="text/javascript"></script>
-    </body>
+    <div class="page-container">
+        {{template "header" .}}
+            <main>
+                {{template "main" .}}
+            </main>
+        </body>
+        {{template "footer" .}}
+    </div>
+    <script src="/static/js/main.js" type="text/javascript"></script>
+    <body>
 </html>
 {{end}}

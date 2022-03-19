@@ -43,9 +43,9 @@ const (
 )
 
 var (
-	DEFAULT_NAV     = []Navitem{{Title: "Home", Route: "/"}, {Title: "Login", Route: "/login"}}
-	AUTH_NAV        = []Navitem{{Title: "Home", Route: "/"}, {Title: "Deployments", Route: "/deploy"}}
-	ADMIN_NAV       = []Navitem{{Title: "Home", Route: "/"}, {Title: "Deployments", Route: "/deploy"}, {Title: "Admin", Route: "/admin"}}
+	DEFAULT_NAV     = []Navitem{{Title: "Login", Route: "/login"}}
+	AUTH_NAV        = []Navitem{{Title: "Deployments", Route: "/deploy"}}
+	ADMIN_NAV       = []Navitem{{Title: "Deployments", Route: "/deploy"}, {Title: "Admin", Route: "/admin"}}
 	DEFAULT_CONTENT = PageContent{Navigation: DEFAULT_NAV}
 	DEFAULT_CONTEXT = Context{User{}, DEFAULT_CONTENT}
 )
