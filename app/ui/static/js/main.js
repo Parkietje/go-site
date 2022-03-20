@@ -6,3 +6,13 @@ for (var i = 0; i < navLinks.length; i++) {
 		break;
 	}
 }
+
+document.getElementById("menu-button").addEventListener("click", toggleMenu);
+
+function toggleMenu() {
+	if(document.getElementById("sidebar").style.display == "none") {
+		document.getElementById("sidebar").style.display = "block";
+	} else {
+		document.getElementById("sidebar").style.display = "none";
+	}
+} 

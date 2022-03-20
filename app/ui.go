@@ -53,7 +53,7 @@ var (
 func home(w http.ResponseWriter, r *http.Request) {
 	context, auth := getContext(r)
 	if auth {
-		context.PageContent.PNG, _ = imgBase64Str("ui/static/img/pngegg.png")
+		context.PageContent.PNG, _ = imgBase64Str("ui/static/icons/pngegg.png")
 	}
 	render(HOME_template, context, w, r)
 }
@@ -62,7 +62,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		context, auth := getContext(r)
 		if auth {
-			context.PageContent.PNG, _ = imgBase64Str("ui/static/img/pngegg.png")
+			context.PageContent.PNG, _ = imgBase64Str("ui/static/icons/pngegg.png")
 		}
 		render(LOGIN_template, context, w, r)
 	}
@@ -75,7 +75,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		} else {
 			token := uuid.New().String()
 			setSessionCookie(user, token, w)
-			img, _ := imgBase64Str("ui/static/img/pngegg.png")
+			img, _ := imgBase64Str("ui/static/icons/pngegg.png")
 			context := Context{User{user, token}, PageContent{AUTH_NAV, nil, img}}
 			if user == ADMIN {
 				context.PageContent.Navigation = ADMIN_NAV

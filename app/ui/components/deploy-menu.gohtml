@@ -1,17 +1,17 @@
 {{define "deploy"}}
-    <div data-controller="deploy">
-        <div class="sidebar">
+    <div data-controller="deploy" class="main-grid">
+        <div class="sidebar" id="sidebar">
             <a data-action="deploy#show" data-deploy-target-param="upload">Upload module</a>
             <a data-action="deploy#show" data-deploy-target-param="overview">List deployments</a>
         </div>
 {{end}}
 
 {{define "deploy-data"}}
-        <div data-deploy-target="upload"; class="center-data hide">
+        <div data-deploy-target="upload"; class="center-data hide grid-content">
             {{template "file-upload" .}}
         </div>
 
-        <div data-deploy-target="overview"; class="center-data hide">
+        <div data-deploy-target="overview"; class="center-data hide grid-content">
             {{template "list-blobs" .}}
         </div>
     </div>

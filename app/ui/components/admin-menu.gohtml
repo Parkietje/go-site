@@ -1,25 +1,25 @@
 {{define "admin"}}
-    <div data-controller="admin">
-        <div class="sidebar">
+    <div data-controller="admin" class="main-grid">
+        <div class="sidebar" id="sidebar">
             <a data-action="admin#show" data-admin-target-param="add">Add user</a>
             <a data-action="admin#show" data-admin-target-param="delete">Delete user</a>
         </div>
 {{end}}
 
 {{define "admin-data"}}
-        <div data-admin-target="add"; class="center-data hide">
+        <div data-admin-target="add"; class="center-data hide grid-content">
             <h2>Add user</h2>
             <form action="/admin/add" method="post">
-                Username:<input type="text" name="username">
-                Password:<input type="password" name="password">
+                Username:<input type="text" name="username"><br>
+                Password:<input type="password" name="password"><br>
                 <input type="submit" value="Add user">
             </form>
         </div>
 
-        <div data-admin-target="delete"; class="center-data hide">
+        <div data-admin-target="delete"; class="center-data hide grid-content">
             <h2>Delete user</h2>
             <form action="/admin/delete" method="post">
-                Username:<input type="text" name="hash">
+                Username:<input type="text" name="hash"><br>
                 <input type="submit" value="Delete user">
             </form>
         </div>

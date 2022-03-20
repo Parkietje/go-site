@@ -29,7 +29,7 @@
 
     --rainbow-height: 0.5rem;
     --footer-height: 1.5rem;
-    --header-border: 1vw;
+    --header-border: 0.25rem;
 }
 
 
@@ -68,36 +68,44 @@ p {
 /*  HEADER SECTION      */
 /*                      */
 header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+
     background-image: linear-gradient(to right,     #34495e, #34495e 14%, #9b59b6 14%, #9b59b6 29%, #3498db 29%, #3498db 43%, #62cb31 43%, #62cb31 58%, #ffb606 58%, #ffb606 72%, #e67e22 72%, #e67e22 87%, #e74c3c 87%, #e74c3c 100%);
     background-size: 100% var(--rainbow-height);
     padding-top: var(--rainbow-height);
     background-repeat: no-repeat;
     border-bottom: var(--header-border) solid var(--clr-background-150);
+    align-items: center;
 }
 
-a.logo {
-    background-repeat: no-repeat;
-    background-size: var(--font-size-default) var(--font-size-default);
-    background-position: var(--font-size-small) var(--font-size-small);
+.menu-button{
     height: var(--font-size-large);
     width: var(--font-size-large);
+    margin-left: 1rem;
+}
+
+.title-icon{
+    max-height: var(--font-size-xlarge);
+    margin-top: calc(var(--font-size-xxlarge) - var(--font-size-xlarge));
 }
 
 a.title {
+    display: flex;
     font-size: var(--font-size-xxlarge);
     color: var(--clr-primary-400);
     text-decoration: none;
+    justify-self: left;
+    align-content: center;
+    margin-left: 0.25rem;
 }
 
 a.logout {
     font-size: var(--font-size-default);
     color: var(--clr-primary-400);
     text-decoration: none;
-}
-
-a.logo:hover {
-    color: var(--clr-primary-400);
-    text-decoration: none;
+    justify-self: right;
+    margin-right: 1rem;
 }
 
 a.title:hover {
@@ -113,16 +121,19 @@ a.logout:hover {
 /*  NAV SECTION         */
 /*                      */
 nav {
+    display: flex;
     font-size: var(--font-size-large);
     font-weight:var(--font-weight-default);
     border-bottom: var(--header-border) solid var(--clr-background-150);
     background: var(--clr-neutral-100);
     color: var(--clr-background-200);
+    justify-content: left;
 }
 
 nav a {
     color: var(--clr-primary-200);
     text-decoration: none;
+    margin-left: 1rem;
 }
 
 nav a.live {
@@ -142,72 +153,9 @@ main {
     font-weight: var(--font-weight-default);
 }
 
-h2 {
-    font-size: var(--font-size-default);
-    font-weight: var(--font-weight-h1);
-}
-
-textarea {
-    padding: 2vw;
-    width: 100%;
-}
-
-main a {
-    color: var(--clr-primary-200);
-    text-decoration: none;
-}
-
-main a:hover {
-    color: var(--clr-primary-200-hover);
-    text-decoration: underline;
-}
-
-/*                      */
-/*  BUTTONS SECTION     */
-/*                      */
-input, button {
-    background-color: var(--clr-primary-200);
-    border-radius: 1vw;
-    color: var(--clr-neutral-100);
-    border: none;
-    font-size: var(--font-size-large);
-}
-
-input:hover, button:hover {
-    background-color: var(--clr-primary-200-hover);
-    color: var(--clr-neutral-200);
-    cursor: pointer;
-    text-decoration: none;
-    font-size: var(--font-size-large);
-}
-
-input[type="file"] {
-    background-color: var(--clr-neutral-200);
-    color: var(--clr-primary-200);
-}
-
-form input[type=text], form input[type="password"], form input[type="email"] {
-    color: var(--clr-background-200);
-    background: var(--clr-neutral-100);
-    border: 1px solid var(--clr-background-150);
-    border-radius: 3px;
-    font-size: var(--font-size-large);
-    width: 90%;
-}
-
-
-/*                      */
-/*  FOOTER SECTION      */
-/*                      */
-footer {
-    border-top: 1px solid var(--clr-background-150);
-    background: var(--clr-background-100);
-    color: var(--clr-background-200);
-    text-align: center;
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: var(--footer-height); 
+.main-grid {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
 }
 
 
@@ -216,14 +164,23 @@ footer {
 /*                      */
 .sidebar {
     padding: 0;
-    width: 25vw;
+    max-width: 20ch;
+    min-height: 86vh;
     background-color: var(--clr-primary-400);
-    position: relative;
-    top: 0;
-    left: 0;
-    height: 100%;
     font-size: var(--font-size-large);
-    overflow: hidden;
+}
+
+@media (max-width: 450px){
+    .sidebar{
+        display: none;
+    }
+
+    a.title{
+        color: var(--clr-neutral-200);
+    }
+    a.title:hover {
+        color: var(--clr-neutral-200);
+    }
 }
   
 .sidebar a {
@@ -245,4 +202,71 @@ footer {
 
 .center-data.hide {
     display : none
+}
+
+/*                         */
+/*  INPUT, FORMS, BUTTONS  */
+/*                         */
+input[type="file"] {
+    background-color: var(--clr-neutral-200);
+    color: var(--clr-primary-200);
+    border: 1px solid var(--clr-background-150);
+}
+
+form input[type=text], form input[type="password"], form input[type="email"] {
+    color: var(--clr-background-200);
+    background: var(--clr-neutral-100);
+    border: 1px solid var(--clr-background-150);
+    border-radius: 3px;
+    font-size: var(--font-size-large);
+}
+
+input, button {
+    background-color: var(--clr-primary-200);
+    border-radius: 1vw;
+    color: var(--clr-neutral-100);
+    border: none;
+    font-size: var(--font-size-large);
+}
+
+input:hover, button:hover {
+    background-color: var(--clr-primary-200-hover);
+    color: var(--clr-neutral-200);
+    cursor: pointer;
+    text-decoration: none;
+    font-size: var(--font-size-large);
+}
+
+h2 {
+    font-size: var(--font-size-default);
+    font-weight: var(--font-weight-h1);
+}
+
+main a {
+    color: var(--clr-primary-200);
+    text-decoration: none;
+}
+
+main a:hover {
+    color: var(--clr-primary-200-hover);
+    text-decoration: underline;
+}
+
+/*                      */
+/*  FOOTER SECTION      */
+/*                      */
+footer {
+    border-top: 1px solid var(--clr-background-150);
+    background: var(--clr-background-100);
+    color: var(--clr-background-200);
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: var(--footer-height); 
+}
+
+footer a {
+    color: var(--clr-primary-200);
+    text-decoration: none;
 }
