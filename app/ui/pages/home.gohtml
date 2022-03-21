@@ -3,13 +3,10 @@
 {{define "title"}}Home{{end}}
 
 {{define "main"}}
-        {{if .User.Account}}
-            <img src="data:image/png;base64,{{.PageContent.PNG}}"/>
-        {{else}}
-            <p class="shiftleft">There's nothing to see here yet!</p>
-        {{end}}
+    {{template "home" .}}
+    {{template "home-data" .}}   
 {{end}}
 
 {{define "script"}}
-
+    {{template "home-controller" .}}
 {{end}}

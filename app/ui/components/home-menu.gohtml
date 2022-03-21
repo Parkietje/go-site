@@ -1,0 +1,81 @@
+{{define "home"}}
+    <div data-controller="home" class="main-grid">
+        <div class="sidebar" id="sidebar">
+            <!--add sidebar items here-->
+            {{if .PageContent.Sidebar}}
+                {{range .PageContent.Sidebar}}
+                    <a data-action="home#show" data-home-target-param="{{.Route}}">{{.Title}}</a>
+                {{end}}
+            {{end}}
+
+        </div>
+{{end}}
+
+{{define "home-data"}}
+
+        <div data-home-target="img"; class="center-data hide grid-content">
+            <img src="data:image/png;base64,{{.PageContent.PNG}}"/>
+        </div>
+
+        <div data-home-target="login"; class="center-data hide grid-content">
+            {{if not .User.SessionCookie}}
+            <form>
+                Username:<input type="text" data-home-target="username" name="username"><br>
+                Password:<input type="password" data-home-target="password" name="password"><br>
+                <input type="submit" data-action="home#auth" value="Login">
+            </form>
+            {{else}}
+            <form>
+                <input type="submit" data-action="home#logout" value="Logout" />
+            </form>
+            {{end}}
+        </div>
+
+{{end}}
+
+{{define "home-controller"}}
+    Stimulus.register("home", class extends Controller {
+ 
+        static targets = ["img", "login", "username", "password"];
+
+        initialize(){
+          console.log('init')
+        }
+
+        show({ params }) {
+            let target = params["target"]
+            if (target == "img") {
+                this.imgTarget.style.display = "block"
+                this.loginTarget.style.display = "none"
+            } else if (target == "login"){
+                this.loginTarget.style.display = "block"
+                this.imgTarget.style.display = "none"
+            }
+        }
+
+        auth(){
+            console.log('auth')
+           
+            const name = this.usernameTarget.value
+            console.log(name)
+            const pw = this.passwordTarget.value
+            console.log('this is the pw: "' + pw + '"')
+            
+            let formData = new FormData();
+            formData.append('username', name)
+            formData.append('password', pw)
+
+            fetch('http://localhost:8000/auth', {
+                method: 'POST', 
+                body: JSON.stringify({username: name, password: pw}),
+                headers: {'Accept': 'application/json','Content-Type': 'application/json'}
+            }).then(response => console.log(response))
+
+        }
+
+        logout(){
+            console.log('logout')
+            fetch('http://localhost:8000/logout')
+        }
+    })
+{{end}}

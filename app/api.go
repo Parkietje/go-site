@@ -2,13 +2,46 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
+
+	"github.com/google/uuid"
 )
+
+type loginUser struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+func auth(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte("unauthorized"))
+		}
+		var u loginUser
+		if err := json.Unmarshal(body, &u); err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte("unauthorized"))
+		}
+		user := u.Username
+		pw := u.Password
+		if passwordCheck(hash(user, ""), pw) != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte("unauthorized"))
+		} else {
+			token := uuid.New().String()
+			setSessionCookie(user, token, w)
+			w.WriteHeader(http.StatusOK)
+		}
+	}
+}
 
 func list(w http.ResponseWriter, r *http.Request) {
 	_, auth := getContext(r)

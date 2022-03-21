@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/patrickmn/go-cache"
 )
 
@@ -37,13 +36,12 @@ type Navitem struct {
 
 const (
 	HOME_template   = "ui/pages/home.gohtml"
-	LOGIN_template  = "ui/pages/login.gohtml"
 	ADMIN_template  = "ui/pages/admin.gohtml"
 	DEPLOY_template = "ui/pages/deploy.gohtml"
 )
 
 var (
-	DEFAULT_NAV     = []Navitem{{Title: "Login", Route: "/login"}}
+	DEFAULT_NAV     = []Navitem{}
 	AUTH_NAV        = []Navitem{{Title: "Deployments", Route: "/deploy"}}
 	ADMIN_NAV       = []Navitem{{Title: "Deployments", Route: "/deploy"}, {Title: "Admin", Route: "/admin"}}
 	DEFAULT_CONTENT = PageContent{Navigation: DEFAULT_NAV}
@@ -53,44 +51,12 @@ var (
 func home(w http.ResponseWriter, r *http.Request) {
 	context, auth := getContext(r)
 	if auth {
+		context.Sidebar = []Navitem{{Title: "Log out", Route: "login"}, {Title: "Image", Route: "img"}}
 		context.PageContent.PNG, _ = imgBase64Str("ui/static/icons/pngegg.png")
+	} else {
+		context.Sidebar = []Navitem{{Title: "Login", Route: "login"}}
 	}
 	render(HOME_template, context, w, r)
-}
-
-func login(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		context, auth := getContext(r)
-		if auth {
-			context.PageContent.PNG, _ = imgBase64Str("ui/static/icons/pngegg.png")
-		}
-		render(LOGIN_template, context, w, r)
-	}
-	if r.Method == "POST" {
-		r.ParseForm()
-		user := r.Form["username"][0]
-		pw := r.Form["password"][0]
-		if passwordCheck(hash(user, ""), pw) != nil {
-			render(LOGIN_template, DEFAULT_CONTEXT, w, r)
-		} else {
-			token := uuid.New().String()
-			setSessionCookie(user, token, w)
-			img, _ := imgBase64Str("ui/static/icons/pngegg.png")
-			context := Context{User{user, token}, PageContent{AUTH_NAV, nil, img}}
-			if user == ADMIN {
-				context.PageContent.Navigation = ADMIN_NAV
-			}
-			render(HOME_template, context, w, r)
-		}
-	}
-}
-
-func logout(w http.ResponseWriter, r *http.Request) {
-	account, _, err := verifySessionCookie(r)
-	if err == nil {
-		deleteSessionCookie(account, w)
-	}
-	login(w, r)
 }
 
 func admin(w http.ResponseWriter, r *http.Request) {
@@ -133,6 +99,15 @@ func deploy(w http.ResponseWriter, r *http.Request) {
 	} else {
 		render(HOME_template, context, w, r)
 	}
+}
+
+func logout(w http.ResponseWriter, r *http.Request) {
+	account, _, err := verifySessionCookie(r)
+	if err == nil {
+		deleteSessionCookie(account, w)
+		fmt.Println("session cookie deleted")
+	}
+	http.Redirect(w, r, "http://localhost:8000", http.StatusSeeOther)
 }
 
 // parse html templates and execute response

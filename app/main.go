@@ -81,7 +81,7 @@ func main() {
 
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.FS(static))))
 	r.HandleFunc("/", home)
-	r.HandleFunc("/login", login)
+	r.HandleFunc("/auth", auth)
 	r.HandleFunc("/logout", logout)
 	r.HandleFunc("/admin", admin)
 	r.HandleFunc("/admin/{service}", admin)
