@@ -38,7 +38,8 @@ func auth(w http.ResponseWriter, r *http.Request) {
 		} else {
 			token := uuid.New().String()
 			setSessionCookie(user, token, w)
-			w.WriteHeader(http.StatusOK)
+			w.WriteHeader(http.StatusAccepted)
+			w.Write([]byte(token))
 		}
 	}
 }
