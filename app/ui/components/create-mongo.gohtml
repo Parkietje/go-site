@@ -1,0 +1,13 @@
+{{define "create-mongo"}}
+    <div data-controller="create-mongo">
+        <button data-action="click->create-mongo#create">Create Mongo</button>
+    </div>
+{{end}}
+
+{{define "create-mongo-controller"}}
+    Stimulus.register("create-mongo", class extends Controller {
+        create() {
+            fetch('http://localhost:8000/create-mongo').then(response => console.log(response))
+        }
+    })
+{{end}}

@@ -89,9 +89,12 @@ func main() {
 	r.HandleFunc("/logout", logout)
 
 	// API ROUTES
-	r.HandleFunc("/auth", auth)
+	r.HandleFunc("/login", login)
 	r.HandleFunc("/list", list)
 	r.HandleFunc("/upload", upload)
+	r.HandleFunc("/create-mongo", createMongo)
+	r.HandleFunc("/setup-mongo", setupMongo)
+	r.HandleFunc("/list-mongos", listMongos)
 
 	log.Println("Starting server on :8000")
 	err = http.ListenAndServe(":8000", r)

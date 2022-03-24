@@ -3,6 +3,9 @@
         <div class="sidebar" id="sidebar">
             <a data-action="deploy#show" data-deploy-target-param="upload">Upload module</a>
             <a data-action="deploy#show" data-deploy-target-param="overview">List deployments</a>
+            <a data-action="deploy#show" data-deploy-target-param="setup">Setup Mongo</a>
+            <a data-action="deploy#show" data-deploy-target-param="list">View Mongos</a>
+            <a data-action="deploy#show" data-deploy-target-param="init">Create Mongo</a>
         </div>
 {{end}}
 
@@ -14,17 +17,25 @@
         <div data-deploy-target="overview"; class="center-data hide grid-content">
             {{template "list-blobs" .}}
         </div>
+        
+        <div data-deploy-target="setup"; class="center-data hide grid-content">
+            {{template "setup-mongo" .}}
+        </div>
+
+        <div data-deploy-target="list"; class="center-data hide grid-content">
+            {{template "list-vms" .}}
+        </div>
+
+        <div data-deploy-target="init"; class="center-data hide grid-content">
+            {{template "create-mongo" .}}
+        </div>
     </div>
 {{end}}
 
 {{define "deploy-controller"}}
     Stimulus.register("deploy", class extends Controller {
 
-        static targets = ["upload", "overview"]
-
-        initialize(){
-          console.log('init')
-        }
+        static targets = ["upload", "overview", "setup", "list", "init"]
 
         show({ params }) {
             // show target
@@ -33,12 +44,39 @@
             if (target == "upload") {
                 this.uploadTarget.style.display = "block"
                 this.overviewTarget.style.display = "none"
+                this.setupTarget.style.display = "none"
+                this.listTarget.style.display = "none"
+                this.initTarget.style.display = "none"
             } else if (target == "overview"){
                 this.overviewTarget.style.display = "block"
                 this.uploadTarget.style.display = "none"
+                this.setupTarget.style.display = "none"
+                this.listTarget.style.display = "none"
+                this.initTarget.style.display = "none"
+            } else if (target == "setup"){
+                this.setupTarget.style.display = "block"
+                this.uploadTarget.style.display = "none"
+                this.overviewTarget.style.display = "none"
+                this.listTarget.style.display = "none"
+                this.initTarget.style.display = "none"
+            } else if (target == "list"){
+                this.listTarget.style.display = "block"
+                this.uploadTarget.style.display = "none"
+                this.overviewTarget.style.display = "none"
+                this.setupTarget.style.display = "none"
+                this.initTarget.style.display = "none"
+            } else if (target == "init"){
+                this.initTarget.style.display = "block"
+                this.uploadTarget.style.display = "none"
+                this.overviewTarget.style.display = "none"
+                this.setupTarget.style.display = "none"
+                this.listTarget.style.display = "none"
             }
         }     
     })
     {{template "file-upload-controller" .}}
     {{template "list-blobs-controller" .}}
+    {{template "setup-mongo-controller" .}}
+    {{template "list-vms-controller" .}}
+    {{template "create-mongo-controller" .}}
 {{end}}

@@ -1,0 +1,37 @@
+{{define "setup-mongo"}}
+    <div data-controller="setup-mongo">
+        <form>
+            Instance name:<input type="text" data-setup-mongo-target="name"><br>
+            Database name:<input type="text" data-setup-mongo-target="dbname"><br>
+            Mongo username:<input type="text" data-setup-mongo-target="user"><br>
+            Mongo password:<input type="text" data-setup-mongo-target="pass"><br>
+            <input type="submit" data-action="setup-mongo#setup" value="Setup Mongo">
+        </form>
+    </div>
+{{end}}
+
+{{define "setup-mongo-controller"}}
+    Stimulus.register("setup-mongo", class extends Controller {
+        
+        static targets = ["name", "dbname", "user", "pass"];
+        
+        setup() {
+
+            const name = this.nameTarget.value
+            const dbname = this.dbnameTarget.value
+            const user = this.userTarget.value
+            const pass = this.passTarget.value
+
+            fetch('http://localhost:8000/setup-mongo', {
+                method: 'POST', 
+                body: JSON.stringify({
+                "name": name,
+                "dbname": dbname,
+                "user": user,
+                "pass": pass
+                }),
+                headers: {'Accept': 'application/json','Content-Type': 'application/json'}
+            }).then(response => console.log(response))
+        }
+    })
+{{end}}

@@ -18,7 +18,7 @@ type loginUser struct {
 	Password string `json:"password"`
 }
 
-func auth(w http.ResponseWriter, r *http.Request) {
+func login(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
@@ -88,6 +88,83 @@ func upload(w http.ResponseWriter, r *http.Request) {
 		// reduces memory allocations in more intense projects
 		buf.Reset()
 		uploadBlob(path)
+	} else {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("unauthorized"))
+	}
+}
+
+func createMongo(w http.ResponseWriter, r *http.Request) {
+	_, auth := getContext(r)
+	if auth {
+		mongos, _ := listVMs()
+		var arr []string
+		_ = json.Unmarshal([]byte(mongos), &arr)
+		count := len(arr)
+		name := "mongo-test-" + fmt.Sprintf("%d", count)
+		fmt.Println(name)
+		bindIP, _ := deployAzureMongo(name)
+		fmt.Println(bindIP)
+	} else {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("unauthorized"))
+	}
+}
+
+type mongoSetupRequest struct {
+	InstanceName  string `json:"name"`
+	DBName        string `json:"dbname"`
+	MongoUser     string `json:"user"`
+	MongoPassword string `json:"pass"`
+}
+
+func setupMongo(w http.ResponseWriter, r *http.Request) {
+	_, auth := getContext(r)
+	if auth {
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte("unauthorized"))
+		}
+		var msr mongoSetupRequest
+		if err := json.Unmarshal(body, &msr); err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte("unauthorized"))
+		}
+
+		fmt.Println(msr.InstanceName)
+		IP, _ := getIP(msr.InstanceName)
+		fmt.Println(IP)
+
+		SCP("C:/Users/YanniChiodi/Code/go-site/mongo-setup/", IP)
+
+		execute("chmod +x /home/ubuntu/install_mongodb.sh", IP)
+		execute("sudo /home/ubuntu/install_mongodb.sh", IP)
+
+		execute("chmod +x /home/ubuntu/setup_user_and_db_mongo.sh", IP)
+		execute("sudo /home/ubuntu/setup_user_and_db_mongo.sh -u="+msr.MongoUser+" -p="+msr.MongoPassword+" -d="+msr.DBName, IP)
+
+		execute("chmod +x /home/ubuntu/set_mongo_bindIp.sh", IP)
+		execute("sudo /home/ubuntu/set_mongo_bindIp.sh", IP)
+
+	} else {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("unauthorized"))
+	}
+}
+
+func listMongos(w http.ResponseWriter, r *http.Request) {
+	_, auth := getContext(r)
+	if auth {
+		s, e := listVMs()
+		if e != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("internal error"))
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Accept", "application/json")
+		w.Write([]byte(s))
 	} else {
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte("unauthorized"))

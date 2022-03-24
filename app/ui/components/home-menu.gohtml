@@ -65,7 +65,7 @@
             formData.append('username', name)
             formData.append('password', pw)
 
-            fetch('http://localhost:8000/auth', {
+            fetch('http://localhost:8000/login', {
                 method: 'POST', 
                 body: JSON.stringify({username: name, password: pw}),
                 headers: {'Accept': 'application/json','Content-Type': 'application/json'}

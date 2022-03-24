@@ -12,3 +12,6 @@ app/tmp
 
 # OSX files
 .DS_Store
+
+#secret
+mongo-setup/

@@ -105,7 +105,6 @@ func logout(w http.ResponseWriter, r *http.Request) {
 	account, _, err := verifySessionCookie(r)
 	if err == nil {
 		deleteSessionCookie(account, w)
-		fmt.Println("session cookie deleted")
 	}
 	http.Redirect(w, r, "http://localhost:8000", http.StatusSeeOther)
 }

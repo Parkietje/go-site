@@ -1,0 +1,16 @@
+{{define "list-vms"}}
+    <div data-controller="list-vms">
+        <button data-action="click->list-vms#list">List vms</button>
+    </div>
+{{end}}
+
+{{define "list-vms-controller"}}
+    Stimulus.register("list-vms", class extends Controller {
+        
+        list() {
+            fetch('http://localhost:8000/list-mongos')
+            .then(response => response.text())
+            .then(data => console.log(data))
+        }
+    })
+{{end}}
