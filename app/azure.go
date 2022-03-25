@@ -162,9 +162,9 @@ func SCP(folder string, destinationIP string) error {
 	files = files[1:]
 	for _, fullpath := range files {
 
-		fmt.Println("scp " + fmt.Sprint(fullpath) + " ubuntu@" + fmt.Sprint(destinationIP) + ":/home/ubuntu/")
+		fmt.Println("scp " + "-o StrictHostKeyChecking=no " + fmt.Sprint(fullpath) + " ubuntu@" + fmt.Sprint(destinationIP) + ":/home/ubuntu/")
 
-		cmd := exec.Command("scp", fullpath, "ubuntu@"+fmt.Sprint(destinationIP)+":/home/ubuntu/")
+		cmd := exec.Command("scp", "-o", "StrictHostKeyChecking=no", fullpath, "ubuntu@"+fmt.Sprint(destinationIP)+":/home/ubuntu/")
 
 		stdout, err := cmd.Output()
 
@@ -182,9 +182,9 @@ func SCP(folder string, destinationIP string) error {
 
 func execute(command string, destinationIP string) error {
 
-	fmt.Println("ssh " + " ubuntu@" + fmt.Sprint(destinationIP) + " " + command)
+	fmt.Println("ssh " + "-o StrictHostKeyChecking=no " + " ubuntu@" + fmt.Sprint(destinationIP) + " " + command)
 
-	cmd := exec.Command("ssh", "-i", "C:/Users/YanniChiodi/.ssh/id_rsa", "ubuntu@"+fmt.Sprint(destinationIP), command)
+	cmd := exec.Command("ssh", "-o", "StrictHostKeyChecking=no", "-i", "C:/Users/YanniChiodi/.ssh/id_rsa", "ubuntu@"+fmt.Sprint(destinationIP), command)
 
 	stdout, err := cmd.Output()
 
