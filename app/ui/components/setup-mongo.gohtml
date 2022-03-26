@@ -22,7 +22,7 @@
             const user = this.userTarget.value
             const pass = this.passTarget.value
 
-            fetch('http://localhost:8000/setup-mongo', {
+            fetch('http://localhost:8000/mongos/setup', {
                 method: 'POST', 
                 body: JSON.stringify({
                 "name": name,

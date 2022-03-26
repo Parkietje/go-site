@@ -3,11 +3,9 @@ package main
 import (
 	"encoding/base64"
 	"errors"
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/patrickmn/go-cache"
@@ -63,29 +61,6 @@ func admin(w http.ResponseWriter, r *http.Request) {
 	user, _, err := verifySessionCookie(r)
 	if (err == nil) && (user == ADMIN) {
 		context, _ := getContext(r)
-		urlparts := strings.Split(r.RequestURI, "/")
-		var service string
-		if len(urlparts) >= 3 {
-			service = urlparts[2]
-		}
-		switch service {
-
-		case "add":
-			r.ParseForm()
-			user := r.Form["username"][0]
-			password := r.Form["password"][0]
-			salt := hash(genSecret(), "s@lty?")
-			addUser(user, password, salt)
-			fmt.Println("user added")
-
-		case "delete":
-			r.ParseForm()
-			user := r.Form["hash"][0]
-			deleteUser(user)
-			fmt.Println("user deleted")
-
-		}
-
 		render(ADMIN_template, context, w, r)
 	} else {
 		home(w, r)
@@ -97,7 +72,7 @@ func deploy(w http.ResponseWriter, r *http.Request) {
 	if auth {
 		render(DEPLOY_template, context, w, r)
 	} else {
-		render(HOME_template, context, w, r)
+		home(w, r)
 	}
 }
 

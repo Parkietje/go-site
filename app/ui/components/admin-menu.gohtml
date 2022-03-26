@@ -1,26 +1,26 @@
 {{define "admin"}}
     <div data-controller="admin" class="main-grid">
         <div class="sidebar" id="sidebar">
-            <a data-action="admin#show" data-admin-target-param="add">Add user</a>
-            <a data-action="admin#show" data-admin-target-param="delete">Delete user</a>
+            <a data-action="admin#show" data-admin-target-param="addForm">Add user</a>
+            <a data-action="admin#show" data-admin-target-param="deleteForm">Delete user</a>
         </div>
 {{end}}
 
 {{define "admin-data"}}
-        <div data-admin-target="add"; class="center-data hide grid-content">
+        <div data-admin-target="addForm"; class="center-data hide grid-content">
             <h2>Add user</h2>
-            <form action="/admin/add" method="post">
-                Username:<input type="text" name="username"><br>
-                Password:<input type="password" name="password"><br>
-                <input type="submit" value="Add user">
+            <form>
+                Username:<input type="text" data-admin-target="adduser"><br>
+                Password:<input type="password" data-admin-target="password"><br>
+                <input type="submit" data-action="admin#add" value="Add user">
             </form>
         </div>
 
-        <div data-admin-target="delete"; class="center-data hide grid-content">
+        <div data-admin-target="deleteForm"; class="center-data hide grid-content">
             <h2>Delete user</h2>
-            <form action="/admin/delete" method="post">
-                Username:<input type="text" name="hash"><br>
-                <input type="submit" value="Delete user">
+            <form>
+                Username:<input type="text" data-admin-target="deleteuser"><br>
+                <input type="submit" data-action="admin#delete" value="Delete user">
             </form>
         </div>
     </div>
@@ -29,7 +29,7 @@
 {{define "admin-controller"}}
     Stimulus.register("admin", class extends Controller {
 
-        static targets = ["add", "delete"]
+        static targets = ["add", "delete", "addForm", "deleteForm", "adduser", "password", "deleteuser"]
 
         initialize(){
           console.log('init')
@@ -39,13 +39,42 @@
             // show target
             let target = params["target"]
             
-            if (target == "add") {
-                this.addTarget.style.display = "block"
-                this.deleteTarget.style.display = "none"
-            } else if (target == "delete"){
-                this.deleteTarget.style.display = "block"
-                this.addTarget.style.display = "none"
+            if (target == "addForm") {
+                this.addFormTarget.style.display = "block"
+                this.deleteFormTarget.style.display = "none"
+            } else if (target == "deleteForm"){
+                this.deleteFormTarget.style.display = "block"
+                this.addFormTarget.style.display = "none"
             }
-        }     
+        }
+
+        add() {
+            const user = this.adduserTarget.value
+            const password = this.passwordTarget.value
+
+
+            fetch('http://localhost:8000/users', {
+                method: 'POST', 
+                body: JSON.stringify({
+                    "username": user,
+                    "password": password
+                }),
+                headers: {'Accept': 'application/json','Content-Type': 'application/json'}
+            }).then(response => console.log(response))
+        }
+
+        delete() {
+            const user = this.deleteuserTarget.value
+            var host =  'http://localhost:8000/users/'
+            host += user
+            fetch( host , {
+                method: 'DELETE', 
+                body: JSON.stringify({
+                    "username": user
+                }),
+                headers: {'Accept': 'application/json','Content-Type': 'application/json'}
+            }).then(response => console.log(response))
+        }
+
     })
 {{end}}

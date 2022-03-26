@@ -47,7 +47,7 @@ func passwordCheck(account string, password string) error {
 }
 
 // store new user in /data/accounts files
-func addUser(user string, password string, salt string) (err error) {
+func saveUser(user string, password string, salt string) (err error) {
 	user = hash(user, "")
 
 	// add to file lambda
@@ -73,7 +73,7 @@ func addUser(user string, password string, salt string) (err error) {
 }
 
 // delete user info from /data/accounts files
-func deleteUser(user string) (err error) {
+func removeUser(user string) (err error) {
 	// delete lambda
 	del := func(user string, file string) error {
 		jmap, err := unmarshal(file)

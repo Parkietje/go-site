@@ -17,7 +17,7 @@ var (
 	STORAGE_KEY     string
 )
 
-func uploadBlob(path string) error {
+func uploadAzureBlob(path string) error {
 
 	if STORAGE_ACCOUNT == "" || CONTAINER_NAME == "" || STORAGE_KEY == "" {
 		return errors.New("No azure credentials supplied")
@@ -55,7 +55,7 @@ func uploadBlob(path string) error {
 	return nil
 }
 
-func listBlobs() (string, error) {
+func listAzureBlobs() (string, error) {
 	result := ""
 
 	if STORAGE_ACCOUNT == "" || CONTAINER_NAME == "" || STORAGE_KEY == "" {

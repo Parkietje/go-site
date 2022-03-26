@@ -44,10 +44,49 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func list(w http.ResponseWriter, r *http.Request) {
+func users(w http.ResponseWriter, r *http.Request) {
+	user, _, err := verifySessionCookie(r)
+	if (err == nil) && (user == ADMIN) {
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte("unauthorized"))
+		}
+		var u loginUser
+		if err := json.Unmarshal(body, &u); err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte("unauthorized"))
+		}
+
+		switch r.Method {
+		case http.MethodPost:
+			salt := hash(genSecret(), "s@lty?")
+			err = saveUser(u.Username, u.Password, salt)
+			if err == nil {
+				fmt.Println("user added")
+			} else {
+				fmt.Println("couldn't add user")
+			}
+			return
+
+		case http.MethodDelete:
+			err = removeUser(u.Username)
+			if err == nil {
+				fmt.Println("user deleted")
+			} else {
+				fmt.Println("couldn't delete user")
+			}
+			return
+		}
+	}
+	w.WriteHeader(http.StatusUnauthorized)
+	w.Write([]byte("unauthorized"))
+}
+
+func listBlobs(w http.ResponseWriter, r *http.Request) {
 	_, auth := getContext(r)
 	if auth {
-		s, e := listBlobs()
+		s, e := listAzureBlobs()
 		if e != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte("internal error"))
@@ -62,7 +101,7 @@ func list(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func upload(w http.ResponseWriter, r *http.Request) {
+func uploadBlob(w http.ResponseWriter, r *http.Request) {
 	_, auth := getContext(r)
 	if auth {
 		r.ParseMultipartForm(32 << 20) // limit your max input length!
@@ -87,7 +126,25 @@ func upload(w http.ResponseWriter, r *http.Request) {
 		// I reset the buffer in case I want to use it again
 		// reduces memory allocations in more intense projects
 		buf.Reset()
-		uploadBlob(path)
+		uploadAzureBlob(path)
+	} else {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("unauthorized"))
+	}
+}
+
+func listMongos(w http.ResponseWriter, r *http.Request) {
+	_, auth := getContext(r)
+	if auth {
+		s, e := listVMs()
+		if e != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("internal error"))
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Accept", "application/json")
+		w.Write([]byte(s))
 	} else {
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte("unauthorized"))
@@ -147,24 +204,6 @@ func setupMongo(w http.ResponseWriter, r *http.Request) {
 		execute("chmod +x /home/ubuntu/set_mongo_bindIp.sh", IP)
 		execute("sudo /home/ubuntu/set_mongo_bindIp.sh", IP)
 
-	} else {
-		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte("unauthorized"))
-	}
-}
-
-func listMongos(w http.ResponseWriter, r *http.Request) {
-	_, auth := getContext(r)
-	if auth {
-		s, e := listVMs()
-		if e != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("internal error"))
-			return
-		}
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Accept", "application/json")
-		w.Write([]byte(s))
 	} else {
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte("unauthorized"))

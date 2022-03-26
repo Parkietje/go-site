@@ -74,7 +74,7 @@ func main() {
 			}
 			f.Write([]byte("{}"))
 		}
-		addUser(ADMIN, MASTER_PASSWORD, "some_s@lt")
+		saveUser(ADMIN, MASTER_PASSWORD, "some_s@lt")
 	}
 
 	r := mux.NewRouter()
@@ -83,18 +83,18 @@ func main() {
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.FS(static))))
 	r.HandleFunc("/", home)
 	r.HandleFunc("/admin", admin)
-	r.HandleFunc("/admin/{service}", admin)
 	r.HandleFunc("/deploy", deploy)
-	r.HandleFunc("/deploy/{command}", deploy)
 	r.HandleFunc("/logout", logout)
 
 	// API ROUTES
 	r.HandleFunc("/login", login)
-	r.HandleFunc("/list", list)
-	r.HandleFunc("/upload", upload)
-	r.HandleFunc("/create-mongo", createMongo)
-	r.HandleFunc("/setup-mongo", setupMongo)
-	r.HandleFunc("/list-mongos", listMongos)
+	r.HandleFunc("/users", users)
+	r.HandleFunc("/users/{user}", users)
+	r.HandleFunc("/blobs", listBlobs)
+	r.HandleFunc("/blobs/upload", uploadBlob)
+	r.HandleFunc("/mongos/create", createMongo)
+	r.HandleFunc("/mongos/setup", setupMongo)
+	r.HandleFunc("/mongos", listMongos)
 
 	log.Println("Starting server on :8000")
 	err = http.ListenAndServe(":8000", r)

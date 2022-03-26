@@ -37,43 +37,46 @@
 
         static targets = ["upload", "overview", "setup", "list", "init"]
 
+        hideAll(){
+            this.uploadTarget.style.display = "none"
+            this.overviewTarget.style.display = "none"
+            this.setupTarget.style.display = "none"
+            this.listTarget.style.display = "none"
+            this.initTarget.style.display = "none"
+        }
+
         show({ params }) {
             // show target
             let target = params["target"]
-            
-            if (target == "upload") {
-                this.uploadTarget.style.display = "block"
-                this.overviewTarget.style.display = "none"
-                this.setupTarget.style.display = "none"
-                this.listTarget.style.display = "none"
-                this.initTarget.style.display = "none"
-            } else if (target == "overview"){
-                this.overviewTarget.style.display = "block"
-                this.uploadTarget.style.display = "none"
-                this.setupTarget.style.display = "none"
-                this.listTarget.style.display = "none"
-                this.initTarget.style.display = "none"
-            } else if (target == "setup"){
-                this.setupTarget.style.display = "block"
-                this.uploadTarget.style.display = "none"
-                this.overviewTarget.style.display = "none"
-                this.listTarget.style.display = "none"
-                this.initTarget.style.display = "none"
-            } else if (target == "list"){
-                this.listTarget.style.display = "block"
-                this.uploadTarget.style.display = "none"
-                this.overviewTarget.style.display = "none"
-                this.setupTarget.style.display = "none"
-                this.initTarget.style.display = "none"
-            } else if (target == "init"){
-                this.initTarget.style.display = "block"
-                this.uploadTarget.style.display = "none"
-                this.overviewTarget.style.display = "none"
-                this.setupTarget.style.display = "none"
-                this.listTarget.style.display = "none"
+
+            this.hideAll()
+
+            switch(target) {
+
+                case "upload":
+                    this.uploadTarget.style.display = "block"
+                    break;
+
+                case "overview":
+                    this.overviewTarget.style.display = "block"
+                    break;
+
+                case "list":
+                    this.listTarget.style.display = "block"
+                    break;
+
+                case "setup":
+                    this.setupTarget.style.display = "block"
+                    break;
+
+                case "init":
+                    this.initTarget.style.display = "block"
+                    break;
             }
-        }     
+        }
+
     })
+
     {{template "file-upload-controller" .}}
     {{template "list-blobs-controller" .}}
     {{template "setup-mongo-controller" .}}
