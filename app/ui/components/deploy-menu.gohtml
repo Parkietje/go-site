@@ -6,6 +6,7 @@
             <a data-action="deploy#show" data-deploy-target-param="setup">Setup Mongo</a>
             <a data-action="deploy#show" data-deploy-target-param="list">View Mongos</a>
             <a data-action="deploy#show" data-deploy-target-param="init">Create Mongo</a>
+            <a data-action="deploy#show" data-deploy-target-param="status">Status Mongo</a>
         </div>
 {{end}}
 
@@ -29,13 +30,17 @@
         <div data-deploy-target="init"; class="center-data hide grid-content">
             {{template "create-mongo" .}}
         </div>
+
+        <div data-deploy-target="status"; class="center-data hide grid-content">
+            {{template "status-mongo" .}}
+        </div>
     </div>
 {{end}}
 
 {{define "deploy-controller"}}
     Stimulus.register("deploy", class extends Controller {
 
-        static targets = ["upload", "overview", "setup", "list", "init"]
+        static targets = ["upload", "overview", "setup", "list", "init", "status"]
 
         hideAll(){
             this.uploadTarget.style.display = "none"
@@ -43,6 +48,7 @@
             this.setupTarget.style.display = "none"
             this.listTarget.style.display = "none"
             this.initTarget.style.display = "none"
+            this.statusTarget.style.display = "none"
         }
 
         show({ params }) {
@@ -72,6 +78,10 @@
                 case "init":
                     this.initTarget.style.display = "block"
                     break;
+
+                case "status":
+                    this.statusTarget.style.display = "block"
+                    break;
             }
         }
 
@@ -82,4 +92,5 @@
     {{template "setup-mongo-controller" .}}
     {{template "list-vms-controller" .}}
     {{template "create-mongo-controller" .}}
+    {{template "status-mongo-controller" .}}
 {{end}}

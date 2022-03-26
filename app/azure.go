@@ -99,16 +99,12 @@ func deployAzureMongo(name string) (string, error) {
 		"--size", "Standard_B2ms",
 		"--ssh-key-values", "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC+ghGzHmkkHAjQ6haCim6ssXtAWdrVrzLU8yA2rE4tFEhMxt0R6+31W3KeLBnJR9Mt7uyNlLHBpgURDkPfqLy3WN5HnetoNaA2qBFbEjgT+khu6h0tGllf+PqM4UgrvPYe3HJdUS/VWQzHvnWvG/PvQNrSF+IiduvF4osx+2/+oZ+kOT9Wu0usVUoZRIcgQHtpptul1HTTVMXT8ggj14ywzgnqeYrGwjBOYRqTVKFsJaTSaW8/CCm84tVSZgdS8DSwLVKSXO1uPXdBdjjX2OAhKaGcFsT+yAJhLzWeGgvN1lIcs+SPUuV5MsMYGlAxp3AL/cCprMC9NnSPPkqbdzWp1j8V0a1NFJqXu6oMj4fm/dUESU2yQ9JW0YURB8dncHGpptId5GkOcB/uFP2yrQK2b+2U+Yoi0xlC+AOdu2kBoorHB4DjySJzR8IGEwB/etrq7ZkdiBHA2RQ5nsItSQRJSzU8k4G/m63C2Re1ChBqVMydUZhgpzj803j9ynHIX9k= azuread\\yannichiodi@LAPTOP-NQIP5U8V",
 	)
-
 	stdout, err := cmd.Output()
-
 	if err != nil {
 		fmt.Println(err.Error())
 		return result, err
 	}
 	values := gjson.Get(string(stdout), "privateIpAddress")
-	println(values.String())
-
 	return values.String(), nil
 }
 
@@ -118,16 +114,13 @@ func listVMs() (string, error) {
 	cmd := exec.Command("az", "vm", "list",
 		"-g", "RG_UBIOPS",
 	)
-
 	stdout, err := cmd.Output()
-
 	if err != nil {
 		fmt.Println(err.Error())
 		return result, err
 	}
 	values := gjson.Get(string(stdout), "#.name")
 	println(values.String())
-
 	return values.String(), nil
 }
 
@@ -138,15 +131,12 @@ func getIP(VM string) (string, error) {
 		"-g", "RG_UBIOPS",
 		"-n", VM,
 	)
-
 	stdout, err := cmd.Output()
-
 	if err != nil {
 		fmt.Println(err.Error())
 		return result, err
 	}
 	values := gjson.Get(string(stdout), "0.virtualMachine.network.privateIpAddresses.0")
-
 	return values.String(), nil
 }
 
@@ -161,39 +151,21 @@ func SCP(folder string, destinationIP string) error {
 	}
 	files = files[1:]
 	for _, fullpath := range files {
-
 		fmt.Println("scp " + "-o StrictHostKeyChecking=no " + fmt.Sprint(fullpath) + " ubuntu@" + fmt.Sprint(destinationIP) + ":/home/ubuntu/")
-
 		cmd := exec.Command("scp", "-o", "StrictHostKeyChecking=no", fullpath, "ubuntu@"+fmt.Sprint(destinationIP)+":/home/ubuntu/")
-
 		stdout, err := cmd.Output()
-
 		if err != nil {
 			fmt.Println(err.Error())
 			return err
 		}
-
 		fmt.Println(string(stdout))
-
 	}
-
 	return nil
 }
 
-func execute(command string, destinationIP string) error {
-
+func execute(command string, destinationIP string) (string, error) {
 	fmt.Println("ssh " + "-o StrictHostKeyChecking=no " + " ubuntu@" + fmt.Sprint(destinationIP) + " " + command)
-
 	cmd := exec.Command("ssh", "-o", "StrictHostKeyChecking=no", "-i", "C:/Users/YanniChiodi/.ssh/id_rsa", "ubuntu@"+fmt.Sprint(destinationIP), command)
-
 	stdout, err := cmd.Output()
-
-	if err != nil {
-		fmt.Println(err.Error())
-		return err
-	}
-
-	fmt.Println(string(stdout))
-
-	return nil
+	return string(stdout), err
 }

@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/google/uuid"
 )
@@ -204,6 +205,35 @@ func setupMongo(w http.ResponseWriter, r *http.Request) {
 		execute("chmod +x /home/ubuntu/set_mongo_bindIp.sh", IP)
 		execute("sudo /home/ubuntu/set_mongo_bindIp.sh", IP)
 
+		execute("chmod +x /home/ubuntu/ping.sh", IP)
+		_, e := execute("sudo /home/ubuntu/ping.sh", IP)
+		if e == nil {
+			fmt.Println("mongo setup successful")
+		} else {
+			fmt.Println("an error occured while setting up the mongo")
+		}
+
+	} else {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("unauthorized"))
+	}
+}
+
+func checkMongoStatus(w http.ResponseWriter, r *http.Request) {
+	_, auth := getContext(r)
+	if auth {
+		urlparts := strings.Split(r.RequestURI, "/")
+		instance := urlparts[3]
+		IP, _ := getIP(instance)
+		_, e := execute("sudo /home/ubuntu/ping.sh", IP)
+		w.WriteHeader(http.StatusOK)
+		if e == nil {
+			fmt.Println("mongo running")
+			w.Write([]byte("mongo running"))
+		} else {
+			fmt.Println("mongo down")
+			w.Write([]byte("mongo down"))
+		}
 	} else {
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte("unauthorized"))

@@ -94,6 +94,7 @@ func main() {
 	r.HandleFunc("/blobs/upload", uploadBlob)
 	r.HandleFunc("/mongos/create", createMongo)
 	r.HandleFunc("/mongos/setup", setupMongo)
+	r.HandleFunc("/mongos/status/{mongo}", checkMongoStatus)
 	r.HandleFunc("/mongos", listMongos)
 
 	log.Println("Starting server on :8000")

@@ -1,0 +1,23 @@
+{{define "status-mongo"}}
+    <div data-controller="status-mongo">
+        <form>
+            Instance name:<input type="text" data-status-mongo-target="name"><br>
+            <input type="submit" data-action="status-mongo#status" value="Check status Mongo">
+        </form>
+    </div>
+{{end}}
+
+{{define "status-mongo-controller"}}
+    Stimulus.register("status-mongo", class extends Controller {
+        
+        static targets = ["name"];
+        
+        status() {
+            var host = 'http://localhost:8000/mongos/status/'
+            const name = this.nameTarget.value
+            host += name
+
+            fetch(host).then(response => console.log(response))
+        }
+    })
+{{end}}
