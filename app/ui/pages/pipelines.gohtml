@@ -1,0 +1,14 @@
+{{template "base" .}}
+
+{{define "title"}}
+  Pipelines
+{{end}}
+
+{{define "main"}}
+  {{template "pipelines" .}}
+  {{template "pipelines-data" .}}
+{{end}}
+
+{{define "script"}}
+  {{template "pipelines-controller" .}}
+{{end}}

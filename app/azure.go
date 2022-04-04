@@ -17,6 +17,10 @@ var (
 	STORAGE_KEY     string
 )
 
+const (
+	MONGO_RG = "DEV_TEST"
+)
+
 func uploadAzureBlob(path string) error {
 
 	if STORAGE_ACCOUNT == "" || CONTAINER_NAME == "" || STORAGE_KEY == "" {
@@ -88,13 +92,13 @@ func deployAzureMongo(name string) (string, error) {
 
 	cmd := exec.Command("az", "vm", "create",
 		"-n", name,
-		"-g", "RG_UBIOPS",
-		"--vnet-name", "VNET-ubiops",
+		"-g", MONGO_RG,
+		"--vnet-name", "DEV_VNET",
 		"--subnet", "mongo-subnet",
 		"--image", "ubuntults",
 		"--admin-username", "ubuntu",
 		"--public-ip-address", "",
-		"--nsg", "mongodb-nsg",
+		"--nsg", "mongo-wien-dev-nsg",
 		"--os-disk-size-gb", "30",
 		"--size", "Standard_B2ms",
 		"--ssh-key-values", "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC+ghGzHmkkHAjQ6haCim6ssXtAWdrVrzLU8yA2rE4tFEhMxt0R6+31W3KeLBnJR9Mt7uyNlLHBpgURDkPfqLy3WN5HnetoNaA2qBFbEjgT+khu6h0tGllf+PqM4UgrvPYe3HJdUS/VWQzHvnWvG/PvQNrSF+IiduvF4osx+2/+oZ+kOT9Wu0usVUoZRIcgQHtpptul1HTTVMXT8ggj14ywzgnqeYrGwjBOYRqTVKFsJaTSaW8/CCm84tVSZgdS8DSwLVKSXO1uPXdBdjjX2OAhKaGcFsT+yAJhLzWeGgvN1lIcs+SPUuV5MsMYGlAxp3AL/cCprMC9NnSPPkqbdzWp1j8V0a1NFJqXu6oMj4fm/dUESU2yQ9JW0YURB8dncHGpptId5GkOcB/uFP2yrQK2b+2U+Yoi0xlC+AOdu2kBoorHB4DjySJzR8IGEwB/etrq7ZkdiBHA2RQ5nsItSQRJSzU8k4G/m63C2Re1ChBqVMydUZhgpzj803j9ynHIX9k= azuread\\yannichiodi@LAPTOP-NQIP5U8V",
@@ -112,7 +116,7 @@ func listVMs() (string, error) {
 	//result := []string{}
 	result := ""
 	cmd := exec.Command("az", "vm", "list",
-		"-g", "RG_UBIOPS",
+		"-g", "DEV_TEST",
 	)
 	stdout, err := cmd.Output()
 	if err != nil {
@@ -128,7 +132,7 @@ func getIP(VM string) (string, error) {
 	//result := []string{}
 	result := ""
 	cmd := exec.Command("az", "vm", "list-ip-addresses",
-		"-g", "RG_UBIOPS",
+		"-g", MONGO_RG,
 		"-n", VM,
 	)
 	stdout, err := cmd.Output()

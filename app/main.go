@@ -84,6 +84,7 @@ func main() {
 	r.HandleFunc("/", home)
 	r.HandleFunc("/admin", admin)
 	r.HandleFunc("/deploy", deploy)
+	r.HandleFunc("/pipelines", pipelines)
 	r.HandleFunc("/logout", logout)
 
 	// API ROUTES

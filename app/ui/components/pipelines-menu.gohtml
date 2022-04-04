@@ -1,0 +1,41 @@
+{{define "pipelines"}}
+    <div data-controller="pipelines" class="main-grid">
+        <div class="sidebar" id="sidebar">
+            <a data-action="pipelines#show" data-pipelines-target-param="create">Create Pipeline</a>
+        </div>
+{{end}}
+
+{{define "pipelines-data"}}
+        <div data-pipelines-target="create"; class="center-data hide grid-content">
+            {{template "create-pipeline" .}}
+        </div>
+    </div>
+{{end}}
+
+{{define "pipelines-controller"}}
+    Stimulus.register("pipelines", class extends Controller {
+
+        static targets = ["create"]
+
+        hideAll(){
+            this.createTarget.style.display = "none"
+        }
+
+        show({ params }) {
+            // show target
+            let target = params["target"]
+
+            this.hideAll()
+
+            switch(target) {
+
+                case "create":
+                    this.createTarget.style.display = "block"
+                    break;
+            }
+        }
+
+    })
+
+    {{template "create-pipeline-controller" .}}
+{{end}}

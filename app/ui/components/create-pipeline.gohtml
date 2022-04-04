@@ -1,0 +1,13 @@
+{{define "create-pipeline"}}
+    <div data-controller="create-pipeline">
+        <button data-action="click->create-pipeline#create">Create Pipeline</button>
+    </div>
+{{end}}
+
+{{define "create-pipeline-controller"}}
+    Stimulus.register("create-pipeline", class extends Controller {
+        create() {
+            fetch('http://localhost:8000/pipelines/create').then(response => console.log(response))
+        }
+    })
+{{end}}

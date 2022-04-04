@@ -33,15 +33,16 @@ type Navitem struct {
 }
 
 const (
-	HOME_template   = "ui/pages/home.gohtml"
-	ADMIN_template  = "ui/pages/admin.gohtml"
-	DEPLOY_template = "ui/pages/deploy.gohtml"
+	HOME_template      = "ui/pages/home.gohtml"
+	ADMIN_template     = "ui/pages/admin.gohtml"
+	DEPLOY_template    = "ui/pages/deploy.gohtml"
+	PIPELINES_template = "ui/pages/pipelines.gohtml"
 )
 
 var (
 	DEFAULT_NAV     = []Navitem{}
-	AUTH_NAV        = []Navitem{{Title: "Deployments", Route: "/deploy"}}
-	ADMIN_NAV       = []Navitem{{Title: "Deployments", Route: "/deploy"}, {Title: "Admin", Route: "/admin"}}
+	AUTH_NAV        = []Navitem{{Title: "Deployments", Route: "/deploy"}, {Title: "Pipelines", Route: "/pipelines"}}
+	ADMIN_NAV       = []Navitem{{Title: "Deployments", Route: "/deploy"}, {Title: "Pipelines", Route: "/pipelines"}, {Title: "Admin", Route: "/admin"}}
 	DEFAULT_CONTENT = PageContent{Navigation: DEFAULT_NAV}
 	DEFAULT_CONTEXT = Context{User{}, DEFAULT_CONTENT}
 )
@@ -71,6 +72,15 @@ func deploy(w http.ResponseWriter, r *http.Request) {
 	context, auth := getContext(r)
 	if auth {
 		render(DEPLOY_template, context, w, r)
+	} else {
+		home(w, r)
+	}
+}
+
+func pipelines(w http.ResponseWriter, r *http.Request) {
+	context, auth := getContext(r)
+	if auth {
+		render(PIPELINES_template, context, w, r)
 	} else {
 		home(w, r)
 	}
