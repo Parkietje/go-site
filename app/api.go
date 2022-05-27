@@ -160,6 +160,7 @@ func createMongo(w http.ResponseWriter, r *http.Request) {
 		_ = json.Unmarshal([]byte(mongos), &arr)
 		count := len(arr)
 		name := "mongo-test-" + fmt.Sprintf("%d", count)
+		name = "mongo-ypenburg-dev"
 		fmt.Println(name)
 		bindIP, _ := deployAzureMongo(name)
 		fmt.Println(bindIP)
@@ -196,17 +197,17 @@ func setupMongo(w http.ResponseWriter, r *http.Request) {
 
 		SCP("C:/Users/YanniChiodi/Code/go-site/mongo-setup/", IP)
 
-		execute("chmod +x /home/ubuntu/install_mongodb.sh", IP)
-		execute("sudo /home/ubuntu/install_mongodb.sh", IP)
+		execute("chmod +x /home/"+fmt.Sprintf(USERNAME)+"/install_mongodb.sh", IP)
+		execute("sudo /home/"+fmt.Sprintf(USERNAME)+"/install_mongodb.sh", IP)
 
-		execute("chmod +x /home/ubuntu/setup_user_and_db_mongo.sh", IP)
-		execute("sudo /home/ubuntu/setup_user_and_db_mongo.sh -u="+msr.MongoUser+" -p="+msr.MongoPassword+" -d="+msr.DBName, IP)
+		execute("chmod +x /home/"+fmt.Sprintf(USERNAME)+"/setup_user_and_db_mongo.sh", IP)
+		execute("sudo /home/"+fmt.Sprintf(USERNAME)+"/setup_user_and_db_mongo.sh -u="+msr.MongoUser+" -p="+msr.MongoPassword+" -d="+msr.DBName, IP)
 
-		execute("chmod +x /home/ubuntu/set_mongo_bindIp.sh", IP)
-		execute("sudo /home/ubuntu/set_mongo_bindIp.sh", IP)
+		execute("chmod +x /home/"+fmt.Sprintf(USERNAME)+"/set_mongo_bindIp.sh", IP)
+		execute("sudo /home/"+fmt.Sprintf(USERNAME)+"/set_mongo_bindIp.sh", IP)
 
-		execute("chmod +x /home/ubuntu/ping.sh", IP)
-		_, e := execute("sudo /home/ubuntu/ping.sh", IP)
+		execute("chmod +x /home/"+fmt.Sprintf(USERNAME)+"/ping.sh", IP)
+		_, e := execute("sudo /home/"+fmt.Sprintf(USERNAME)+"/ping.sh", IP)
 		if e == nil {
 			fmt.Println("mongo setup successful")
 		} else {

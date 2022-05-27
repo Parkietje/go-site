@@ -18,7 +18,11 @@ var (
 )
 
 const (
-	MONGO_RG = "DEV_TEST"
+	MONGO_RG     = "RG_UBIOPS_DEV"
+	MONGO_VNET   = "VNET-ubiops" //VNET-ubiops
+	MONGO_SUBNET = "/subscriptions/31f751e4-b40e-4b28-8eeb-357312b33a92/resourceGroups/RG_UBIOPS/providers/Microsoft.Network/virtualNetworks/VNET-ubiops/subnets/vm-DEV-subnet"
+	MONGO_SG     = "private"
+	USERNAME     = "azureuser"
 )
 
 func uploadAzureBlob(path string) error {
@@ -93,12 +97,12 @@ func deployAzureMongo(name string) (string, error) {
 	cmd := exec.Command("az", "vm", "create",
 		"-n", name,
 		"-g", MONGO_RG,
-		"--vnet-name", "DEV_VNET",
-		"--subnet", "mongo-subnet",
+		//"--vnet-name", MONGO_VNET,
+		"--subnet", MONGO_SUBNET,
 		"--image", "ubuntults",
-		"--admin-username", "ubuntu",
+		"--admin-username", USERNAME,
 		"--public-ip-address", "",
-		"--nsg", "mongo-wien-dev-nsg",
+		"--nsg", MONGO_SG,
 		"--os-disk-size-gb", "30",
 		"--size", "Standard_B2ms",
 		"--ssh-key-values", "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC+ghGzHmkkHAjQ6haCim6ssXtAWdrVrzLU8yA2rE4tFEhMxt0R6+31W3KeLBnJR9Mt7uyNlLHBpgURDkPfqLy3WN5HnetoNaA2qBFbEjgT+khu6h0tGllf+PqM4UgrvPYe3HJdUS/VWQzHvnWvG/PvQNrSF+IiduvF4osx+2/+oZ+kOT9Wu0usVUoZRIcgQHtpptul1HTTVMXT8ggj14ywzgnqeYrGwjBOYRqTVKFsJaTSaW8/CCm84tVSZgdS8DSwLVKSXO1uPXdBdjjX2OAhKaGcFsT+yAJhLzWeGgvN1lIcs+SPUuV5MsMYGlAxp3AL/cCprMC9NnSPPkqbdzWp1j8V0a1NFJqXu6oMj4fm/dUESU2yQ9JW0YURB8dncHGpptId5GkOcB/uFP2yrQK2b+2U+Yoi0xlC+AOdu2kBoorHB4DjySJzR8IGEwB/etrq7ZkdiBHA2RQ5nsItSQRJSzU8k4G/m63C2Re1ChBqVMydUZhgpzj803j9ynHIX9k= azuread\\yannichiodi@LAPTOP-NQIP5U8V",
@@ -116,7 +120,7 @@ func listVMs() (string, error) {
 	//result := []string{}
 	result := ""
 	cmd := exec.Command("az", "vm", "list",
-		"-g", "DEV_TEST",
+		"-g", MONGO_RG,
 	)
 	stdout, err := cmd.Output()
 	if err != nil {
@@ -155,8 +159,8 @@ func SCP(folder string, destinationIP string) error {
 	}
 	files = files[1:]
 	for _, fullpath := range files {
-		fmt.Println("scp " + "-o StrictHostKeyChecking=no " + fmt.Sprint(fullpath) + " ubuntu@" + fmt.Sprint(destinationIP) + ":/home/ubuntu/")
-		cmd := exec.Command("scp", "-o", "StrictHostKeyChecking=no", fullpath, "ubuntu@"+fmt.Sprint(destinationIP)+":/home/ubuntu/")
+		fmt.Println("scp " + "-o StrictHostKeyChecking=no " + fmt.Sprint(fullpath) + " " + USERNAME + "@" + fmt.Sprint(destinationIP) + ":/home/" + fmt.Sprintf(USERNAME))
+		cmd := exec.Command("scp", "-o", "StrictHostKeyChecking=no", fullpath, fmt.Sprintf(USERNAME)+"@"+fmt.Sprint(destinationIP)+":/home/"+fmt.Sprintf(USERNAME))
 		stdout, err := cmd.Output()
 		if err != nil {
 			fmt.Println(err.Error())
@@ -168,8 +172,8 @@ func SCP(folder string, destinationIP string) error {
 }
 
 func execute(command string, destinationIP string) (string, error) {
-	fmt.Println("ssh " + "-o StrictHostKeyChecking=no " + " ubuntu@" + fmt.Sprint(destinationIP) + " " + command)
-	cmd := exec.Command("ssh", "-o", "StrictHostKeyChecking=no", "-i", "C:/Users/YanniChiodi/.ssh/id_rsa", "ubuntu@"+fmt.Sprint(destinationIP), command)
+	fmt.Println("ssh " + "-o StrictHostKeyChecking=no " + USERNAME + "@" + fmt.Sprint(destinationIP) + " " + command)
+	cmd := exec.Command("ssh", "-o", "StrictHostKeyChecking=no", "-i", "C:/Users/YanniChiodi/.ssh/id_rsa", fmt.Sprint(USERNAME)+"@"+fmt.Sprint(destinationIP), command)
 	stdout, err := cmd.Output()
 	return string(stdout), err
 }
